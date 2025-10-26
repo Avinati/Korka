@@ -101,49 +101,38 @@
     let currentAdmin = null;
     const API_BASE_URL = 'http://localhost:3006'; // Добавлена базовая ссылка на сервер
 
-    // Функция входа с проверкой роли
     async function login() {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const errorDiv = document.getElementById('loginError');
-        
-        try {
-            const response = await fetch(`${API_BASE_URL}/admin-auth`, { // Исправлен URL
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: username,
-                    password: password
-                })
-            });
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const errorDiv = document.getElementById('loginError');
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin-auth`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: username, // Поле остается email для совместимости, но используется как логин
+                password: password
+            })
+        });
 
-            const result = await response.json();
+        const result = await response.json();
 
-            if (result.success) {
-                currentAdmin = result.user;
-                document.getElementById('loginForm').classList.add('hidden');
-                document.getElementById('adminPanel').classList.remove('hidden');
-                loadApplications();
-            } else {
-                errorDiv.textContent = result.message;
-            }
-        } catch (error) {
-            console.error('Ошибка при авторизации:', error);
-            errorDiv.textContent = 'Ошибка соединения с сервером. Убедитесь, что сервер запущен на порту 3006.';
+        if (result.success) {
+            currentAdmin = result.user;
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            loadApplications();
+        } else {
+            errorDiv.textContent = result.message;
         }
+    } catch (error) {
+        console.error('Ошибка при авторизации:', error);
+        errorDiv.textContent = 'Ошибка соединения с сервером. Убедитесь, что сервер запущен на порту 3006.';
     }
-
-    // Функция выхода
-    function logout() {
-        currentAdmin = null;
-        document.getElementById('loginForm').classList.remove('hidden');
-        document.getElementById('adminPanel').classList.add('hidden');
-        document.getElementById('username').value = '';
-        document.getElementById('password').value = '';
-        document.getElementById('loginError').textContent = '';
-    }
+}
 
     // Функция загрузки заявок с сервера
     async function loadApplications() {

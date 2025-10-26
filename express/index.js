@@ -436,6 +436,7 @@ app.get('/course-reviews', async (req, res) => {
 });
 
 // Эндпоинт для авторизации администратора с улучшенной обработкой ошибок
+// Эндпоинт для авторизации администратора с улучшенной обработкой ошибок
 app.post('/admin-auth', async (req, res) => {
     console.log('📨 Получен запрос на авторизацию администратора');
     
@@ -451,62 +452,83 @@ app.post('/admin-auth', async (req, res) => {
 
         const { email, password } = req.body;
 
-        console.log('📧 Email:', email);
+        console.log('📧 Логин:', email);
         console.log('🔑 Пароль получен:', password ? 'да' : 'нет');
 
         if (!email || !password) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'Email и пароль обязательны для заполнения' 
+                message: 'Логин и пароль обязательны для заполнения' 
             });
         }
 
-        // Выполняем запрос к базе данных
-        const [users] = await pool.execute(
-            'SELECT user_id, name, surname, nick, email, password, role FROM users WHERE email = ?',
-            [email]
-        );
+        // Проверяем специальные учетные данные администратора
+        if (email === 'Admin' && password === 'KorokNET') {
+            console.log('✅ Успешная авторизация администратора через специальные учетные данные');
+            
+            // Создаем временный объект администратора без записи в БД
+            const adminUser = {
+                user_id: 0, // Специальный ID для администратора
+                name: 'Admin',
+                surname: 'System',
+                nick: 'admin',
+                email: 'admin@system',
+                role: 'admin'
+            };
+            
+            res.json({ 
+                success: true, 
+                message: 'Авторизация прошла успешно!',
+                user: adminUser
+            });
+        } else {
+            // Стандартная проверка через базу данных для обычных пользователей
+            const [users] = await pool.execute(
+                'SELECT user_id, name, surname, nick, email, password, role FROM users WHERE email = ?',
+                [email]
+            );
 
-        if (users.length === 0) {
-            console.log('❌ Пользователь не найден:', email);
-            return res.status(401).json({ 
-                success: false, 
-                message: 'Пользователь с таким email не найден' 
+            if (users.length === 0) {
+                console.log('❌ Пользователь не найден:', email);
+                return res.status(401).json({ 
+                    success: false, 
+                    message: 'Пользователь с таким логином не найден' 
+                });
+            }
+
+            const user = users[0];
+            console.log('👤 Найден пользователь:', user.email, 'Роль:', user.role);
+
+            // Проверяем, является ли пользователь администратором
+            if (user.role !== 'admin') {
+                console.log('🚫 Доступ запрещен для роли:', user.role);
+                return res.status(403).json({ 
+                    success: false, 
+                    message: 'Доступ запрещен. Недостаточно прав.' 
+                });
+            }
+
+            // Проверяем пароль
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            console.log('🔐 Проверка пароля:', isPasswordValid ? 'успешно' : 'неверно');
+            
+            if (!isPasswordValid) {
+                return res.status(401).json({ 
+                    success: false, 
+                    message: 'Неверный пароль' 
+                });
+            }
+
+            console.log('✅ Успешная авторизация администратора:', user.email);
+
+            const { password: _, ...userWithoutPassword } = user;
+            
+            res.json({ 
+                success: true, 
+                message: 'Авторизация прошла успешно!',
+                user: userWithoutPassword
             });
         }
-
-        const user = users[0];
-        console.log('👤 Найден пользователь:', user.email, 'Роль:', user.role);
-
-        // Проверяем, является ли пользователь администратором
-        if (user.role !== 'admin') {
-            console.log('🚫 Доступ запрещен для роли:', user.role);
-            return res.status(403).json({ 
-                success: false, 
-                message: 'Доступ запрещен. Недостаточно прав.' 
-            });
-        }
-
-        // Проверяем пароль
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        console.log('🔐 Проверка пароля:', isPasswordValid ? 'успешно' : 'неверно');
-        
-        if (!isPasswordValid) {
-            return res.status(401).json({ 
-                success: false, 
-                message: 'Неверный пароль' 
-            });
-        }
-
-        console.log('✅ Успешная авторизация администратора:', user.email);
-
-        const { password: _, ...userWithoutPassword } = user;
-        
-        res.json({ 
-            success: true, 
-            message: 'Авторизация прошла успешно!',
-            user: userWithoutPassword
-        });
 
     } catch (error) {
         console.error('❌ Ошибка при авторизации администратора:', error);

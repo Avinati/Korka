@@ -35,18 +35,6 @@
             <h2 class="t1">Ваши заявки:</h2>
         </div>
 
-        <!-- Блок информации о пользователе -->
-        <div id="userInfoSection" class="user-info-section" style="display: none;">
-            <div class="user-info-card">
-                <h3>👤 Информация о пользователе</h3>
-                <div class="user-details">
-                    <p><strong>Пользователь:</strong> <span id="currentUserName">Загрузка...</span></p>
-                    <p><strong>Email:</strong> <span id="currentUserEmail">Загрузка...</span></p>
-                    <p><strong>ID:</strong> <span id="currentUserId">Загрузка...</span></p>
-                </div>
-            </div>
-        </div>
-
         <!-- Блок предупреждения о необходимости авторизации -->
         <div id="authWarning" class="auth-warning" style="display: none;">
             <div class="warning-content">
@@ -175,8 +163,7 @@
 
                     console.log('✅ Пользователь авторизован:', this.currentUserName);
 
-                    // Показываем информацию о пользователе
-                    this.showUserInfo();
+                    // Показываем приветствие
                     document.getElementById('authSection').style.display = 'block';
                     document.getElementById('unauthSection').style.display = 'none';
                     document.getElementById('authWarning').style.display = 'none';
@@ -188,14 +175,6 @@
                     document.getElementById('authSection').style.display = 'none';
                     document.getElementById('unauthSection').style.display = 'block';
                 }
-            }
-
-            showUserInfo() {
-                document.getElementById('userInfoSection').style.display = 'block';
-                document.getElementById('currentUserName').textContent = this.currentUserName;
-                document.getElementById('currentUserEmail').textContent = this.currentUserEmail;
-                document.getElementById('currentUserId').textContent = this.currentUserId;
-                document.getElementById('userGreeting').textContent = `Привет, ${this.currentUserName}!`;
             }
 
             showAuthWarning() {
