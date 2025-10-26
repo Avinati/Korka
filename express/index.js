@@ -6,17 +6,26 @@ const { pool, checkConnection } = require('./bd.js');
 const app = express();
 const PORT = 3006;
 
-
 app.use(cors());
 app.use(express.json());
-
 
 app.listen(PORT, async () => {
     console.log(`🚀 Сервер запущен на порту ${PORT}`);
     await checkConnection();
 });
 
+// Тестовый эндпоинт
+app.get('/test', (req, res) => {
+    res.json({ message: 'Сервер работает!' });
+});
 
+// Эндпоинт для проверки базы данных
+app.get('/check-db', async (req, res) => {
+    const isConnected = await checkConnection();
+    res.json({ databaseConnected: isConnected });
+});
+
+// Регистрация пользователя
 app.post('/reg', async (req, res) => {
     console.log('📨 Получен запрос на регистрацию:', req.body);
     
@@ -32,7 +41,6 @@ app.post('/reg', async (req, res) => {
         notifications 
     } = req.body;
 
-    
     if (!name || !surename || !nick || !email || !phone || !password) {
         return res.json({ 
             success: false, 
@@ -40,7 +48,6 @@ app.post('/reg', async (req, res) => {
         });
     }
 
-   
     if (!personalData || !privacyPolicy) {
         return res.json({ 
             success: false, 
@@ -49,7 +56,6 @@ app.post('/reg', async (req, res) => {
     }
 
     try {
-        
         const [existingUsers] = await pool.execute(
             'SELECT user_id FROM users WHERE email = ? OR nick = ?',
             [email, nick]
@@ -62,10 +68,8 @@ app.post('/reg', async (req, res) => {
             });
         }
 
-       
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        
         const [result] = await pool.execute(
             `INSERT INTO users (name, surname, nick, email, phone, password, role) 
              VALUES (?, ?, ?, ?, ?, ?, 'user')`,
@@ -73,8 +77,6 @@ app.post('/reg', async (req, res) => {
         );
 
         console.log('✅ Пользователь создан с ID:', result.insertId);
-
-       
 
         res.json({ 
             success: true, 
@@ -85,7 +87,6 @@ app.post('/reg', async (req, res) => {
     } catch (error) {
         console.error('❌ Ошибка при регистрации:', error);
         
-       
         let errorMessage = 'Ошибка сервера при регистрации';
         if (error.code === 'ER_DUP_ENTRY') {
             if (error.sqlMessage.includes('email')) {
@@ -104,7 +105,7 @@ app.post('/reg', async (req, res) => {
     }
 });
 
-
+// Получение списка курсов
 app.get('/courses', async (req, res) => {
     try {
         const [courses] = await pool.execute(
@@ -117,13 +118,12 @@ app.get('/courses', async (req, res) => {
     }
 });
 
-
+// Создание заявки
 app.post('/applications', async (req, res) => {
     console.log('📨 Получен запрос на создание заявки:', req.body);
     
     const { userId, courseId, startDate, paymentMethod } = req.body;
 
-   
     if (!userId || !courseId || !startDate || !paymentMethod) {
         return res.json({ 
             success: false, 
@@ -131,7 +131,6 @@ app.post('/applications', async (req, res) => {
         });
     }
 
-    
     if (!['cash', 'phone_transfer'].includes(paymentMethod)) {
         return res.json({ 
             success: false, 
@@ -140,7 +139,6 @@ app.post('/applications', async (req, res) => {
     }
 
     try {
-       
         const [users] = await pool.execute(
             'SELECT user_id FROM users WHERE user_id = ?',
             [userId]
@@ -153,7 +151,6 @@ app.post('/applications', async (req, res) => {
             });
         }
 
-        
         const [courses] = await pool.execute(
             'SELECT course_id, name FROM courses WHERE course_id = ? AND is_active = TRUE',
             [courseId]
@@ -166,7 +163,6 @@ app.post('/applications', async (req, res) => {
             });
         }
 
-        
         const selectedDate = new Date(startDate);
         const currentDate = new Date();
         currentDate.setHours(0, 0, 0, 0);
@@ -178,7 +174,6 @@ app.post('/applications', async (req, res) => {
             });
         }
 
-       
         const [result] = await pool.execute(
             `INSERT INTO applications (user_id, course_id, desired_start_date, payment_method, status) 
              VALUES (?, ?, ?, ?, 'new')`,
@@ -187,7 +182,6 @@ app.post('/applications', async (req, res) => {
 
         console.log('✅ Заявка создана с ID:', result.insertId);
 
-        
         await pool.execute(
             `INSERT INTO application_status_history (application_id, old_status, new_status, changed_by, change_comment) 
              VALUES (?, NULL, 'new', ?, 'Заявка создана')`,
@@ -210,12 +204,12 @@ app.post('/applications', async (req, res) => {
     }
 });
 
+// Авторизация пользователя
 app.post('/auth', async (req, res) => {
     console.log('📨 Получен запрос на авторизацию:', req.body);
     
     const { email, password } = req.body;
 
-   
     if (!email || !password) {
         return res.json({ 
             success: false, 
@@ -224,7 +218,6 @@ app.post('/auth', async (req, res) => {
     }
 
     try {
-       
         const [users] = await pool.execute(
             'SELECT user_id, name, surname, nick, email, password, role FROM users WHERE email = ?',
             [email]
@@ -239,7 +232,6 @@ app.post('/auth', async (req, res) => {
 
         const user = users[0];
 
-        
         const isPasswordValid = await bcrypt.compare(password, user.password);
         
         if (!isPasswordValid) {
@@ -251,7 +243,6 @@ app.post('/auth', async (req, res) => {
 
         console.log('✅ Успешная авторизация пользователя:', user.email);
 
-      
         const { password: _, ...userWithoutPassword } = user;
         
         res.json({ 
@@ -268,11 +259,6 @@ app.post('/auth', async (req, res) => {
             message: 'Ошибка сервера при авторизации' 
         });
     }
-});
-
-
-app.get('/test', (req, res) => {
-    res.json({ message: 'Сервер работает!' });
 });
 
 // Получение заявок пользователя с отзывами
@@ -342,7 +328,6 @@ app.post('/reviews', async (req, res) => {
     }
 
     try {
-        // Проверяем существование заявки и ее статус
         const [applications] = await pool.execute(`
             SELECT a.application_id, a.status, a.user_id 
             FROM applications a 
@@ -365,7 +350,6 @@ app.post('/reviews', async (req, res) => {
             });
         }
 
-        // Проверяем, не оставлял ли пользователь уже отзыв
         const [existingReviews] = await pool.execute(
             'SELECT review_id FROM reviews WHERE application_id = ? AND user_id = ?',
             [applicationId, userId]
@@ -378,7 +362,6 @@ app.post('/reviews', async (req, res) => {
             });
         }
 
-        // Создаем отзыв
         const [result] = await pool.execute(
             `INSERT INTO reviews (user_id, application_id, rating) 
              VALUES (?, ?, ?)`,
@@ -403,7 +386,7 @@ app.post('/reviews', async (req, res) => {
     }
 });
 
-// Получение отзывов для курса (опционально)
+// Получение отзывов для курса
 app.get('/course-reviews', async (req, res) => {
     const { courseId } = req.query;
 
@@ -435,21 +418,11 @@ app.get('/course-reviews', async (req, res) => {
     }
 });
 
-// Эндпоинт для авторизации администратора с улучшенной обработкой ошибок
-// Эндпоинт для авторизации администратора с улучшенной обработкой ошибок
+// Эндпоинт для авторизации администратора
 app.post('/admin-auth', async (req, res) => {
     console.log('📨 Получен запрос на авторизацию администратора');
     
     try {
-        // Проверяем Content-Type
-        const contentType = req.headers['content-type'];
-        if (!contentType || !contentType.includes('application/json')) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Неверный Content-Type. Ожидается application/json' 
-            });
-        }
-
         const { email, password } = req.body;
 
         console.log('📧 Логин:', email);
@@ -466,9 +439,8 @@ app.post('/admin-auth', async (req, res) => {
         if (email === 'Admin' && password === 'KorokNET') {
             console.log('✅ Успешная авторизация администратора через специальные учетные данные');
             
-            // Создаем временный объект администратора без записи в БД
             const adminUser = {
-                user_id: 0, // Специальный ID для администратора
+                user_id: 0,
                 name: 'Admin',
                 surname: 'System',
                 nick: 'admin',
@@ -476,59 +448,57 @@ app.post('/admin-auth', async (req, res) => {
                 role: 'admin'
             };
             
-            res.json({ 
+            return res.json({ 
                 success: true, 
                 message: 'Авторизация прошла успешно!',
                 user: adminUser
             });
-        } else {
-            // Стандартная проверка через базу данных для обычных пользователей
-            const [users] = await pool.execute(
-                'SELECT user_id, name, surname, nick, email, password, role FROM users WHERE email = ?',
-                [email]
-            );
+        }
 
-            if (users.length === 0) {
-                console.log('❌ Пользователь не найден:', email);
-                return res.status(401).json({ 
-                    success: false, 
-                    message: 'Пользователь с таким логином не найден' 
-                });
-            }
+        // Стандартная проверка через базу данных
+        const [users] = await pool.execute(
+            'SELECT user_id, name, surname, nick, email, password, role FROM users WHERE email = ?',
+            [email]
+        );
 
-            const user = users[0];
-            console.log('👤 Найден пользователь:', user.email, 'Роль:', user.role);
-
-            // Проверяем, является ли пользователь администратором
-            if (user.role !== 'admin') {
-                console.log('🚫 Доступ запрещен для роли:', user.role);
-                return res.status(403).json({ 
-                    success: false, 
-                    message: 'Доступ запрещен. Недостаточно прав.' 
-                });
-            }
-
-            // Проверяем пароль
-            const isPasswordValid = await bcrypt.compare(password, user.password);
-            console.log('🔐 Проверка пароля:', isPasswordValid ? 'успешно' : 'неверно');
-            
-            if (!isPasswordValid) {
-                return res.status(401).json({ 
-                    success: false, 
-                    message: 'Неверный пароль' 
-                });
-            }
-
-            console.log('✅ Успешная авторизация администратора:', user.email);
-
-            const { password: _, ...userWithoutPassword } = user;
-            
-            res.json({ 
-                success: true, 
-                message: 'Авторизация прошла успешно!',
-                user: userWithoutPassword
+        if (users.length === 0) {
+            console.log('❌ Пользователь не найден:', email);
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Пользователь с таким логином не найден' 
             });
         }
+
+        const user = users[0];
+        console.log('👤 Найден пользователь:', user.email, 'Роль:', user.role);
+
+        if (user.role !== 'admin') {
+            console.log('🚫 Доступ запрещен для роли:', user.role);
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Доступ запрещен. Недостаточно прав.' 
+            });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        console.log('🔐 Проверка пароля:', isPasswordValid ? 'успешно' : 'неверно');
+        
+        if (!isPasswordValid) {
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Неверный пароль' 
+            });
+        }
+
+        console.log('✅ Успешная авторизация администратора:', user.email);
+
+        const { password: _, ...userWithoutPassword } = user;
+        
+        res.json({ 
+            success: true, 
+            message: 'Авторизация прошла успешно!',
+            user: userWithoutPassword
+        });
 
     } catch (error) {
         console.error('❌ Ошибка при авторизации администратора:', error);
@@ -540,18 +510,11 @@ app.post('/admin-auth', async (req, res) => {
     }
 });
 
-// Простой тестовый эндпоинт для проверки
-app.get('/admin-test', (req, res) => {
-    res.json({ 
-        success: true, 
-        message: 'Сервер админ-панели работает!',
-        timestamp: new Date().toISOString()
-    });
-});
-
 // Получение всех заявок для админ-панели
 app.get('/admin-applications', async (req, res) => {
     try {
+        console.log('📨 Получен запрос на получение заявок для админ-панели');
+        
         const [applications] = await pool.execute(`
             SELECT 
                 a.application_id,
@@ -578,6 +541,8 @@ app.get('/admin-applications', async (req, res) => {
                 a.created_at DESC
         `);
 
+        console.log(`✅ Отправлено ${applications.length} заявок`);
+
         res.json({ 
             success: true, 
             applications 
@@ -597,10 +562,12 @@ app.put('/admin-applications/:id/status', async (req, res) => {
     const applicationId = req.params.id;
     const { newStatus, adminId } = req.body;
 
-    if (!newStatus || !adminId) {
+    console.log(`🔄 Запрос на изменение статуса: заявка ${applicationId}, новый статус: ${newStatus}`);
+
+    if (!newStatus) {
         return res.json({ 
             success: false, 
-            message: 'Все поля обязательны для заполнения' 
+            message: 'Статус обязателен для заполнения' 
         });
     }
 
@@ -619,6 +586,7 @@ app.put('/admin-applications/:id/status', async (req, res) => {
         );
 
         if (currentApps.length === 0) {
+            console.log('❌ Заявка не найдена:', applicationId);
             return res.json({ 
                 success: false, 
                 message: 'Заявка не найдена' 
@@ -626,21 +594,33 @@ app.put('/admin-applications/:id/status', async (req, res) => {
         }
 
         const oldStatus = currentApps[0].status;
+        console.log(`📊 Текущий статус: ${oldStatus}, новый статус: ${newStatus}`);
 
         // Обновляем статус заявки
-        await pool.execute(
+        const [updateResult] = await pool.execute(
             'UPDATE applications SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE application_id = ?',
             [newStatus, applicationId]
         );
+
+        console.log(`✅ Статус заявки ${applicationId} изменен в БД. Затронуто строк:`, updateResult.affectedRows);
+
+        // Для специального администратора (user_id: 0) пропускаем проверку в БД
+        let changedById = adminId;
+        let changeComment = `Статус изменен администратором`;
+        
+        if (adminId === 0) {
+            changedById = null;
+            changeComment = `Статус изменен системным администратором`;
+        }
 
         // Добавляем запись в историю статусов
         await pool.execute(
             `INSERT INTO application_status_history (application_id, old_status, new_status, changed_by, change_comment) 
              VALUES (?, ?, ?, ?, ?)`,
-            [applicationId, oldStatus, newStatus, adminId, `Статус изменен администратором`]
+            [applicationId, oldStatus, newStatus, changedById, changeComment]
         );
 
-        console.log(`✅ Статус заявки ${applicationId} изменен с ${oldStatus} на ${newStatus}`);
+        console.log(`✅ История статусов обновлена для заявки ${applicationId}`);
 
         res.json({ 
             success: true, 
@@ -657,12 +637,16 @@ app.put('/admin-applications/:id/status', async (req, res) => {
     }
 });
 
-app.get('/check-db', async (req, res) => {
-    const isConnected = await checkConnection();
-    res.json({ databaseConnected: isConnected });
+// Тестовый эндпоинт для админ-панели
+app.get('/admin-test', (req, res) => {
+    res.json({ 
+        success: true, 
+        message: 'Сервер админ-панели работает!',
+        timestamp: new Date().toISOString()
+    });
 });
 
-
+// Получение всех пользователей
 app.get('/users', async (req, res) => {
     try {
         const [users] = await pool.execute('SELECT user_id, name, surname, nick, email, phone, created_at FROM users');
@@ -671,4 +655,4 @@ app.get('/users', async (req, res) => {
         console.error('Ошибка при получении пользователей:', error);
         res.json({ success: false, message: 'Ошибка при получении пользователей' });
     }
-});     
+});
