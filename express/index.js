@@ -604,11 +604,11 @@ app.put('/admin-applications/:id/status', async (req, res) => {
 
         console.log(`✅ Статус заявки ${applicationId} изменен в БД. Затронуто строк:`, updateResult.affectedRows);
 
-        // Для специального администратора (user_id: 0) пропускаем проверку в БД
+        // Для специального администратора (user_id: 0) или если adminId не передан
         let changedById = adminId;
         let changeComment = `Статус изменен администратором`;
         
-        if (adminId === 0) {
+        if (!adminId || adminId === 0) {
             changedById = null;
             changeComment = `Статус изменен системным администратором`;
         }
