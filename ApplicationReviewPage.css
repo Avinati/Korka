@@ -223,6 +223,157 @@ html, body
         .rating .star:hover ~ .star {
             color: #ddd;
         }
+        /* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(56, 12, 12, 0.7);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background-color: #fffbf1;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 20px;
+    border: 3px solid #922121;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 8px 25px rgba(56, 12, 12, 0.3);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { 
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to { 
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    color: #380c0c;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    line-height: 1;
+}
+
+.close:hover {
+    color: #af2828;
+    transform: scale(1.1);
+}
+
+.modal-content h3 {
+    font-size: 28px;
+    color: #380c0c;
+    margin-bottom: 25px;
+    text-align: center;
+    border-bottom: 2px solid #380c0c;
+    padding-bottom: 10px;
+}
+
+.review-form p {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #380c0c;
+}
+
+.review-form p strong {
+    color: #922121;
+}
+
+/* Стили для рейтинга в модальном окне */
+
+.rating-section p {
+    text-align: center;
+    margin-bottom: 15px !important;
+    font-size: 22px;
+}
+
+.rating-modal {
+    font-size: 40px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.star-modal {
+    color: #ddd;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0 5px;
+}
+
+.star-modal:hover,
+.star-modal.active {
+    color: gold;
+    transform: scale(1.1);
+}
+
+.rating-modal:hover .star-modal {
+    color: gold;
+}
+
+.rating-modal .star-modal:hover ~ .star-modal {
+    color: #ddd;
+}
+
+/* Кнопка отправки отзыва */
+.btn-submit {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: none;
+    font-family: 'Equilibrist';
+    font-size: 24px;
+    color: #380c0c;
+    border-radius: 15px;
+    border: 2px solid #922121;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.btn-submit:hover {
+    background: #922121;
+    color: #fffbf1;
+    border-radius: 15px;
+    border: 2px solid #922121;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-submit:disabled:hover {
+    background: none;
+    color: #380c0c;
+}
+
 /* Подвал */
 .footer-box {
     background-color: #af2828;
