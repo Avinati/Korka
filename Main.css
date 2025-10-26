@@ -1,0 +1,236 @@
+/* Основное */
+html, body
+{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #fffbf1;
+    font-family:'Equilibrist';
+    color: #380c0c;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Чердак */
+.header-box{
+    background-color: #af2828;
+    flex-direction: column;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.logo-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-left: 120px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo{
+    align-items: center;
+    width: 150px;
+    height: 100px;
+}
+
+.title{
+    justify-content: space-between;
+    align-items: center;
+    font-size: 36px;
+    font-weight: bold;
+    margin-top: -10px;
+    margin-left: 20px;
+    flex-grow: 1;
+}
+
+.undertitle{
+    position: absolute;
+    font-size: 18px;
+    flex-grow: 2;
+    margin-top: 60px;
+    margin-left: 169px;
+}
+
+.buttons{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-right: 120px;
+}
+
+/* Стили для ссылок-кнопок */
+.btn1, .btn2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 300px;
+    height: 50px;
+    background: none;
+    font-family:'Equilibrist';
+    font-size: 24px;
+    color: #380c0c;
+    border-radius: 15px;
+    border: 2px solid #922121;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-left: 220px;
+}
+
+.btn2 {
+    margin-left: 0;
+}
+
+.btn1:hover, .btn2:hover{
+    background: #922121;
+    color: #fffbf1;
+    border-radius: 15px;
+    border: 2px solid #922121;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+/* Основной контент */
+.main-container{
+    border-radius: 30px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 120px;
+    margin-right: 120px;
+    height: 800px;
+    background-color: #e7e2d3;
+    flex-shrink: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 20px;
+}
+
+.content-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 45%;
+}
+
+/* Первая секция - изображение слева, текст справа */
+.first-section {
+    gap: 30px;
+}
+
+.first-section .img1 {
+    width: 400px;
+    height: 350px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    margin-right: 0;
+}
+
+.first-section .text1 {
+    width: 50%;
+    padding: 10px;
+    font-size: 24px;
+    margin-left: 0;
+    flex: 1;
+}
+
+/* Вторая секция - текст слева, изображение справа */
+.second-section {
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.second-section .img2 {
+    width: 400px;
+    height: 350px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    margin-left: 0;
+}
+
+.second-section .text2 {
+    width: 55%;
+    padding: 10px;
+    font-size: 24px;
+    margin-left: 90px;
+    flex: 1;
+}
+
+/* Подвал */
+.footer-box {
+    background-color: #af2828;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.footer-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 100px; 
+}
+
+.footer-columns {
+    display: flex;
+    gap: 150px;
+    margin-right: 520px;
+}
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-column li {
+    font-weight: bold;
+    margin-bottom: 10px;
+    list-style: none;
+}
+
+.footer-column ul {
+    margin: 5px 0;
+    list-style: none;
+    padding: 0;
+}
+
+.footer-column a {
+    color: inherit !important;
+    text-decoration: none !important;
+}
+
+.footer-column a:hover,
+.footer-column a:focus,
+.footer-column a:active {
+    color: inherit !important;
+    text-decoration: none !important;
+}
+
+/* Общие стили для всех ссылок */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+a:hover, a:focus, a:active {
+    text-decoration: none;
+    color: inherit;
+}

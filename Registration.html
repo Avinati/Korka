@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="Registration.css">
+</head>
+<body>
+    <div class="main-container">
+        <div class="somthing-container">
+            <h2 class="t1">Регистрация</h2>
+        </div>
+        <div class="register-form">
+            <form id="registrationForm">
+                <div class="input-group">
+                    <input 
+                        placeholder="Имя"
+                        type="text" 
+                        class="input-field"
+                        name="name"
+                        required
+                    />
+                </div>
+                
+                <div class="input-group">
+                    <input 
+                        placeholder="Фамилия"
+                        type="text" 
+                        class="input-field"
+                        name="surename"
+                        required
+                    />
+                </div>
+                
+                <div class="input-group">
+                    <input 
+                        placeholder="Никнейм" 
+                        type="text" 
+                        class="input-field"
+                        name="nick"
+                        required
+                    />
+                </div>
+                
+                <div class="input-group">
+                    <input 
+                        placeholder="Email" 
+                        type="email" 
+                        class="input-field"
+                        name="email"
+                        required
+                    />
+                </div>
+
+                <div class="input-group">
+                    <input 
+                        type="tel" 
+                        id="phone" 
+                        name="phone" 
+                        placeholder="+7 (999) 123-45-67" 
+                        pattern="^\+7\s?\(\d{3}\)\s?\d{3}-\d{2}-\d{2}$"
+                        title="Формат: +7 (999) 123-45-67"
+                        required
+                        class="input-field"
+                    />
+                </div>
+
+                <div class="input-group">
+                    <input 
+                        placeholder="Пароль" 
+                        type="password" 
+                        class="input-field"
+                        name="password"
+                        minlength="6"
+                        required
+                    />
+                </div>
+                
+                <div class="input-group">
+                    <input 
+                        placeholder="Повторите пароль" 
+                        type="password" 
+                        class="input-field"
+                        name="confirmPassword"
+                        required
+                    />
+                </div>
+                
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input 
+                            type="checkbox" 
+                            class="checkbox-input" 
+                            name="personalData"
+                            required
+                        />
+                        <span class="checkbox-text">Я соглашаюсь на обработку персональных данных *</span>
+                    </label>
+                    
+                    <label class="checkbox-label">
+                        <input 
+                            type="checkbox" 
+                            class="checkbox-input" 
+                            name="privacyPolicy"
+                            required
+                        />
+                        <span class="checkbox-text">Я соглашаюсь с Политикой Конфиденциальности этого сайта *</span>
+                    </label>
+                    
+                    <label class="checkbox-label">
+                        <input 
+                            type="checkbox" 
+                            class="checkbox-input" 
+                            name="notifications"
+                        />
+                        <span class="checkbox-text">Я соглашаюсь на получение уведомлений на почту</span>
+                    </label>
+                </div>
+
+                <div id="message" style="display: none; margin-bottom: 15px; padding: 10px; border-radius: 5px;"></div>
+
+                <button type="submit" class="submit-btn">Зарегистрироваться</button>
+                
+                <div class="login-section">
+                    <span class="login-text">Уже есть аккаунт? </span>
+                    <a href="Authorization.html" class="login-link">Войти!</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                name: formData.get('name'),
+                surename: formData.get('surename'),
+                nick: formData.get('nick'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                password: formData.get('password'),
+                personalData: formData.get('personalData') === 'on',
+                privacyPolicy: formData.get('privacyPolicy') === 'on',
+                notifications: formData.get('notifications') === 'on'
+            };
+
+            // Проверка паролей
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirmPassword');
+            
+            if (password !== confirmPassword) {
+                showMessage('Пароли не совпадают', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showMessage('Пароль должен содержать минимум 6 символов', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3006/reg', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('Регистрация прошла успешно! Автоматический вход...', 'success');
+                    
+                    // После успешной регистрации автоматически логиним пользователя
+                    // Выполняем автоматический вход
+                    try {
+                        const loginResponse = await fetch('http://localhost:3006/auth', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                email: data.email,
+                                password: data.password
+                            })
+                        });
+
+                        const loginResult = await loginResponse.json();
+
+                        if (loginResult.success) {
+                            // Сохраняем данные пользователя
+                            localStorage.setItem('user', JSON.stringify(loginResult.user));
+                            localStorage.setItem('isAuthenticated', 'true');
+                            localStorage.setItem('userId', loginResult.user.user_id);
+                            localStorage.setItem('userName', loginResult.user.name);
+                            localStorage.setItem('userEmail', loginResult.user.email);
+
+                            console.log('✅ Автоматический вход выполнен:', loginResult.user);
+                            
+                            // Очистка формы после успешной регистрации
+                            document.getElementById('registrationForm').reset();
+                            
+                            // Перенаправление на главную страницу через 2 секунды
+                            setTimeout(() => {
+                                window.location.href = 'Main.html';
+                            }, 2000);
+                        } else {
+                            // Если автоматический вход не удался, все равно сохраняем ID
+                            localStorage.setItem('isAuthenticated', 'true');
+                            localStorage.setItem('userId', result.userId);
+                            showMessage('Регистрация успешна! Войдите в систему.', 'success');
+                            setTimeout(() => {
+                                window.location.href = 'Authorization.html';
+                            }, 2000);
+                        }
+                    } catch (loginError) {
+                        console.error('Ошибка автоматического входа:', loginError);
+                        // Сохраняем хотя бы ID пользователя
+                        localStorage.setItem('userId', result.userId);
+                        showMessage('Регистрация успешна! Войдите в систему.', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'Authorization.html';
+                        }, 2000);
+                    }
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showMessage('Ошибка соединения с сервером', 'error');
+            }
+        });
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.style.display = 'block';
+            messageDiv.style.backgroundColor = type === 'success' ? '#d4edda' : '#f8d7da';
+            messageDiv.style.color = type === 'success' ? '#155724' : '#721c24';
+            messageDiv.style.border = type === 'success' ? '1px solid #c3e6cb' : '1px solid #f5c6cb';
+        }
+
+        // Маска для телефона
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
+            e.target.value = '+7' + (x[2] ? ' (' + x[2] : '') + (x[3] ? ') ' + x[3] : '') + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
+        });
+
+        // Проверяем, не авторизован ли пользователь
+        document.addEventListener('DOMContentLoaded', function() {
+            const isAuthenticated = localStorage.getItem('isAuthenticated');
+            if (isAuthenticated === 'true') {
+                console.log('Пользователь уже авторизован');
+                // Можно предложить перейти на главную
+            }
+        });
+    </script>
+</body>
+</html>

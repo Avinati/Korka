@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Страница просмотра заявок</title>
+    <link rel="stylesheet" href="ApplicationReviewPage.css">
+</head>
+<body>
+    <!-- Чердак -->
+    <div class="header-box">
+        <div class="header-container">
+            <a class="logo-container" href="Main.html" style="text-decoration: none; color: inherit;">
+                <img src="media/logo.png" class="logo">
+                <h1 class="title">Корочки.есть</h1>
+                <h3 class="undertitle">Только "Не" качественное государственное оброзование.</h3>
+            </a>
+            <div class="buttons">
+                <div id="authSection" style="display: none;">
+                    <span id="userGreeting" style="margin-right: 15px; color: #333;"></span>
+                    <button id="logoutBtn" class="btn-logout">Выйти</button>
+                </div>
+                <div id="unauthSection">
+                    <a href="Authorization.html" class="btn-auth">Войти</a>
+                </div>
+                <a href="ApplicationReviewPage.html" class="btn1">Ваши заявки</a>
+                <a href="RequestFormationPage.html" class="btn2">Подать заявку</a>
+            </div>
+        </div>
+    </div>
+
+<!-- Основной контент -->
+    <div class="main-container">
+        <div class="somthing-container">
+            <h2 class="t1">Ваши заявки:</h2>
+        </div>
+
+        <!-- Блок информации о пользователе -->
+        <div id="userInfoSection" class="user-info-section" style="display: none;">
+            <div class="user-info-card">
+                <h3>👤 Информация о пользователе</h3>
+                <div class="user-details">
+                    <p><strong>Пользователь:</strong> <span id="currentUserName">Загрузка...</span></p>
+                    <p><strong>Email:</strong> <span id="currentUserEmail">Загрузка...</span></p>
+                    <p><strong>ID:</strong> <span id="currentUserId">Загрузка...</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Блок предупреждения о необходимости авторизации -->
+        <div id="authWarning" class="auth-warning" style="display: none;">
+            <div class="warning-content">
+                <h3>⚠️ Требуется авторизация</h3>
+                <p>Для просмотра заявок необходимо <a href="Authorization.html" style="color: #ff6b6b; text-decoration: underline;">авторизоваться</a></p>
+            </div>
+        </div>
+
+        <!-- Список заявок -->
+        <div id="applicationsList" class="list">
+            <!-- Заявки будут загружаться динамически -->
+        </div>
+
+        <!-- Сообщение о загрузке -->
+        <div id="loadingMessage" class="loading-message">
+            <p>Загрузка ваших заявок...</p>
+        </div>
+
+        <!-- Сообщение об отсутствии заявок -->
+        <div id="noApplicationsMessage" class="no-applications-message" style="display: none;">
+            <div class="no-applications-content">
+                <h3>📝 У вас пока нет заявок</h3>
+                <p>Самое время подать первую заявку на обучение!</p>
+                <a href="RequestFormationPage.html" class="btn-primary">Подать заявку</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для отзыва -->
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Оставить отзыв</h3>
+            <div class="review-form">
+                <p><strong>Специальность:</strong> <span id="modalSpecialty"></span></p>
+                <p><strong>Дата начала:</strong> <span id="modalStartDate"></span></p>
+                
+                <div class="rating-section">
+                    <p><strong>Оцените курс:</strong></p>
+                    <div class="rating-modal">
+                        <span class="star-modal" data-value="1">★</span>
+                        <span class="star-modal" data-value="2">★</span>
+                        <span class="star-modal" data-value="3">★</span>
+                        <span class="star-modal" data-value="4">★</span>
+                        <span class="star-modal" data-value="5">★</span>
+                    </div>
+                    <div class="rating-text">
+                        <span id="ratingValue">0</span>/5
+                    </div>
+                </div>
+
+                <button id="submitReview" class="btn-submit">Отправить отзыв</button>
+            </div>
+        </div>
+    </div>
+
+<!-- Подвал -->
+    <div class="footer-box">
+        <div class="footer-container">
+            <a class="logo-container" href="Main.html" style="text-decoration: none; color: inherit;">
+                <img src="media/logo.png" class="logo">
+                <h1 class="title">Корочки.есть</h1>
+                <h3 class="undertitle">Только "Не" качественное государственное оброзование.</h3>
+            </a>
+            <div class="footer-columns">
+                <div class="footer-column">
+                    <li>Страницы</li>
+                    <ul>
+                        <li><a href="Main.html" style="text-decoration: none; color: inherit;">Главная</a></li>
+                        <li><a href="ApplicationReviewPage.html" style="text-decoration: none; color: inherit;">Страница просмотра заявок</a></li>
+                        <li><a href="RequestFormationPage.html" style="text-decoration: none; color: inherit;">Страница формирования заявки</a></li>
+                        <li><a href="AdminPanel.html" style="text-decoration: none; color: inherit;">Админ-панель</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <li>Документация</li>
+                    <ul>
+                        <li><a href="#" style="text-decoration: none; color: inherit;">Условия пользователя</a></li>
+                        <li><a href="#" style="text-decoration: none; color: inherit;">Условия использования</a></li>
+                        <li><a href="#" style="text-decoration: none; color: inherit;">Политика куки</a></li>
+                        <li><a href="#" style="text-decoration: none; color: inherit;">Политика конфиденциальности</a></li>
+                        <li><a href="#" style="text-decoration: none; color: inherit;">О нас</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ApplicationReview {
+            constructor() {
+                this.currentUserId = null;
+                this.currentUserName = null;
+                this.currentUserEmail = null;
+                this.currentApplicationId = null;
+                this.currentRating = 0;
+                this.applications = [];
+                this.init();
+            }
+
+            async init() {
+                console.log('🚀 Инициализация страницы просмотра заявок');
+                await this.checkAuthentication();
+                this.setupEventListeners();
+                
+                if (this.currentUserId) {
+                    await this.loadApplications();
+                }
+            }
+
+            async checkAuthentication() {
+                console.log('🔍 Проверка авторизации...');
+                
+                const isAuthenticated = localStorage.getItem('isAuthenticated');
+                const userId = localStorage.getItem('userId');
+                const userName = localStorage.getItem('userName');
+                const userEmail = localStorage.getItem('userEmail');
+
+                console.log('Данные авторизации:', { isAuthenticated, userId, userName, userEmail });
+
+                if (isAuthenticated === 'true' && userId) {
+                    // Пользователь авторизован
+                    this.currentUserId = userId;
+                    this.currentUserName = userName || 'Пользователь';
+                    this.currentUserEmail = userEmail || '';
+
+                    console.log('✅ Пользователь авторизован:', this.currentUserName);
+
+                    // Показываем информацию о пользователе
+                    this.showUserInfo();
+                    document.getElementById('authSection').style.display = 'block';
+                    document.getElementById('unauthSection').style.display = 'none';
+                    document.getElementById('authWarning').style.display = 'none';
+
+                } else {
+                    // Пользователь не авторизован
+                    console.log('❌ Пользователь не авторизован');
+                    this.showAuthWarning();
+                    document.getElementById('authSection').style.display = 'none';
+                    document.getElementById('unauthSection').style.display = 'block';
+                }
+            }
+
+            showUserInfo() {
+                document.getElementById('userInfoSection').style.display = 'block';
+                document.getElementById('currentUserName').textContent = this.currentUserName;
+                document.getElementById('currentUserEmail').textContent = this.currentUserEmail;
+                document.getElementById('currentUserId').textContent = this.currentUserId;
+                document.getElementById('userGreeting').textContent = `Привет, ${this.currentUserName}!`;
+            }
+
+            showAuthWarning() {
+                document.getElementById('authWarning').style.display = 'block';
+                document.getElementById('applicationsList').style.display = 'none';
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('noApplicationsMessage').style.display = 'none';
+            }
+
+            async loadApplications() {
+                console.log('📥 Загрузка заявок для пользователя:', this.currentUserId);
+                
+                document.getElementById('loadingMessage').style.display = 'block';
+                document.getElementById('applicationsList').style.display = 'none';
+                document.getElementById('noApplicationsMessage').style.display = 'none';
+
+                try {
+                    const response = await fetch(`http://localhost:3006/user-applications?userId=${this.currentUserId}`);
+                    const result = await response.json();
+
+                    console.log('Ответ сервера:', result);
+
+                    if (result.success) {
+                        this.applications = result.applications;
+                        this.displayApplications();
+                    } else {
+                        throw new Error(result.message);
+                    }
+
+                } catch (error) {
+                    console.error('❌ Ошибка при загрузке заявок:', error);
+                    this.showErrorMessage('Ошибка при загрузке заявок: ' + error.message);
+                } finally {
+                    document.getElementById('loadingMessage').style.display = 'none';
+                }
+            }
+
+            displayApplications() {
+                const container = document.getElementById('applicationsList');
+                container.innerHTML = '';
+
+                if (this.applications.length === 0) {
+                    document.getElementById('noApplicationsMessage').style.display = 'block';
+                    container.style.display = 'none';
+                    return;
+                }
+
+                container.style.display = 'block';
+                document.getElementById('noApplicationsMessage').style.display = 'none';
+
+                this.applications.forEach(application => {
+                    const applicationElement = this.createApplicationElement(application);
+                    container.appendChild(applicationElement);
+                });
+            }
+
+            createApplicationElement(application) {
+                const appDiv = document.createElement('div');
+                appDiv.className = 'application';
+                appDiv.setAttribute('data-application-id', application.application_id);
+                
+                const statusClass = this.getStatusClass(application.status);
+                const isCompleted = application.status === 'completed';
+                const hasReview = application.has_review;
+                const canReview = isCompleted && !hasReview;
+                
+                appDiv.innerHTML = `
+                    <div class="app-details">
+                        <div class="specialty-row">
+                            <p><strong>Специальность:</strong> ${application.course_name}</p>
+                            <span class="app-status ${statusClass}">${this.getStatusText(application.status)}</span>
+                        </div>
+                        <p><strong>Дата подачи:</strong> ${new Date(application.created_at).toLocaleDateString('ru-RU')}</p>
+                        <p><strong>Дата начала:</strong> ${new Date(application.desired_start_date).toLocaleDateString('ru-RU')}</p>
+                        <div class="specialty-row">
+                            <p><strong>Стоимость:</strong> ${application.price.toLocaleString('ru-RU')} руб.</p>
+                            <div class="rating-section">
+                                ${isCompleted ? 
+                                    (hasReview ? 
+                                        `<div class="rating-display">
+                                            <div class="rating">${this.renderStars(application.rating)}</div>
+                                            <div class="rating-text">Оценка: ${application.rating}/5</div>
+                                        </div>` : 
+                                        `<button class="review-btn">
+                                            Оставить отзыв
+                                        </button>`
+                                    ) : 
+                                    `<div class="no-rating">Отзыв доступен после завершения обучения</div>`
+                                }
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Добавляем обработчик для кнопки отзыва только если можно оставить отзыв
+                if (canReview) {
+                    const reviewBtn = appDiv.querySelector('.review-btn');
+                    reviewBtn.addEventListener('click', () => {
+                        this.openReviewModal(application);
+                    });
+                }
+
+                return appDiv;
+            }
+
+            getStatusClass(status) {
+                switch(status) {
+                    case 'new': return 'status-pending';
+                    case 'in_progress': return 'status-approved';
+                    case 'completed': return 'status-completed';
+                    default: return 'status-pending';
+                }
+            }
+
+            getStatusText(status) {
+                switch(status) {
+                    case 'new': return 'Новая';
+                    case 'in_progress': return 'Идет обучение';
+                    case 'completed': return 'Обучение завершено';
+                    default: return status;
+                }
+            }
+
+            renderStars(rating) {
+                let stars = '';
+                for (let i = 1; i <= 5; i++) {
+                    stars += `<span class="star ${i <= rating ? 'active' : ''}">★</span>`;
+                }
+                return stars;
+            }
+
+            openReviewModal(application) {
+                if (!this.currentUserId) {
+                    alert('Пожалуйста, авторизуйтесь для оставления отзыва');
+                    window.location.href = 'Authorization.html';
+                    return;
+                }
+
+                this.currentApplicationId = application.application_id;
+                this.currentRating = 0;
+                
+                document.getElementById('modalSpecialty').textContent = application.course_name;
+                document.getElementById('modalStartDate').textContent = new Date(application.desired_start_date).toLocaleDateString('ru-RU');
+                document.getElementById('ratingValue').textContent = '0';
+                
+                // Сбрасываем звезды
+                document.querySelectorAll('.star-modal').forEach(star => {
+                    star.classList.remove('active');
+                });
+                
+                document.getElementById('reviewModal').style.display = 'block';
+            }
+
+            setupEventListeners() {
+                // Выход из системы
+                document.getElementById('logoutBtn').addEventListener('click', () => {
+                    this.logout();
+                });
+
+                // Закрытие модального окна
+                document.querySelector('.close').addEventListener('click', () => {
+                    document.getElementById('reviewModal').style.display = 'none';
+                });
+
+                // Клик вне модального окна
+                window.addEventListener('click', (event) => {
+                    const modal = document.getElementById('reviewModal');
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+
+                // Рейтинг звездами в модальном окне
+                document.querySelectorAll('.star-modal').forEach(star => {
+                    star.addEventListener('click', () => {
+                        const rating = parseInt(star.getAttribute('data-value'));
+                        this.setRating(rating);
+                    });
+                });
+
+                // Отправка отзыва
+                document.getElementById('submitReview').addEventListener('click', () => {
+                    this.submitReview();
+                });
+
+                // Обновление заявок при фокусе на странице
+                window.addEventListener('focus', () => {
+                    if (this.currentUserId) {
+                        console.log('🔄 Обновление заявок...');
+                        this.loadApplications();
+                    }
+                });
+            }
+
+            setRating(rating) {
+                this.currentRating = rating;
+                document.getElementById('ratingValue').textContent = rating;
+                
+                document.querySelectorAll('.star-modal').forEach(star => {
+                    const starValue = parseInt(star.getAttribute('data-value'));
+                    star.classList.toggle('active', starValue <= rating);
+                });
+            }
+
+            async submitReview() {
+                if (!this.currentUserId) {
+                    alert('Пожалуйста, авторизуйтесь для оставления отзыва');
+                    window.location.href = 'Authorization.html';
+                    return;
+                }
+
+                if (this.currentRating === 0) {
+                    alert('Пожалуйста, выберите оценку');
+                    return;
+                }
+
+                try {
+                    const submitBtn = document.getElementById('submitReview');
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Отправка...';
+
+                    const response = await fetch('http://localhost:3006/reviews', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            userId: this.currentUserId,
+                            applicationId: this.currentApplicationId,
+                            rating: this.currentRating
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert('✅ Отзыв успешно отправлен!');
+                        document.getElementById('reviewModal').style.display = 'none';
+                        await this.loadApplications(); // Перезагружаем список заявок
+                    } else {
+                        alert('❌ Ошибка при отправке отзыва: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('❌ Ошибка при отправке отзыва');
+                } finally {
+                    const submitBtn = document.getElementById('submitReview');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Отправить отзыв';
+                }
+            }
+
+            logout() {
+                if (confirm('Вы уверены, что хотите выйти?')) {
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('isAuthenticated');
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userEmail');
+                    localStorage.removeItem('userRole');
+                    
+                    console.log('👋 Пользователь вышел из системы');
+                    window.location.reload();
+                }
+            }
+
+            showErrorMessage(message) {
+                const container = document.getElementById('applicationsList');
+                container.innerHTML = `
+                    <div class="error-message">
+                        <h3>❌ Ошибка</h3>
+                        <p>${message}</p>
+                        <button onclick="location.reload()" class="btn-retry">Попробовать снова</button>
+                    </div>
+                `;
+                container.style.display = 'block';
+            }
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            new ApplicationReview();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+/* Основное */
+html, body
+{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #fffbf1;
+    font-family:'Equilibrist';
+    color: #380c0c;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Чердак */
+.header-box{
+    background-color: #af2828;
+    flex-direction: column;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.logo-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-left: 120px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo{
+    align-items: center;
+    width: 150px;
+    height: 100px;
+}
+
+.title{
+    justify-content: space-between;
+    align-items: center;
+    font-size: 36px;
+    font-weight: bold;
+    margin-top: -10px;
+    margin-left: 20px;
+    flex-grow: 1;
+}
+
+.undertitle{
+    position: absolute;
+    font-size: 18px;
+    flex-grow: 2;
+    margin-top: 60px;
+    margin-left: 169px;
+}
+
+.buttons{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-right: 120px;
+}
+
+.btn1, .btn2, .btn3 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 300px;
+    height: 50px;
+    background: none;
+    font-family:'Equilibrist';
+    font-size: 24px;
+    color: #380c0c;
+    border-radius: 15px;
+    border: 2px solid #922121;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-left: 220px;
+}
+
+.btn2 {
+    margin-left: 0;
+}
+
+.btn1:hover, .btn2:hover, .btn3:hover{
+    background: #922121;
+    color: #fffbf1;
+    border-radius: 15px;
+    border: 2px solid #922121;
+    cursor: pointer;
+    text-decoration: none;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Основной контент */
+.main-container{
+    border-radius: 30px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 120px;
+    margin-right: 120px;
+    min-height: 500px;
+    background-color: #e7e2d3;
+    flex-shrink: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap:20px;
+}
+
+.somthing-container{
+    border-bottom: 2px solid #380c0c;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+}
+
+.t1 {
+    font-size: 32px;
+    margin: 0;
+    color: #380c0c;
+}
+
+.specialty-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.specialty-row p {
+    margin: 0;
+    font-size: 20px;
+    white-space: nowrap;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+}
+
+.list {
+    background-color: #FFFBF1;
+    border: none; 
+    border-radius: 15px;
+    height: 50px;
+    width: 150px;
+    padding: 0 40px 0 15px; 
+    font-family: 'Equilibrist';
+    font-size: 16px;
+    color: #380c0c;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23922121' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='6 9 12 15 18 9'%3E%3C/polygon%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px;
+}
+
+.list:hover {
+    border-color: #af2828;
+    background-color: #fff9e6;
+}
+
+.list:focus {
+    border-color: #af2828;
+    box-shadow: 0 0 5px rgba(175, 40, 40, 0.3);
+}
+
+/* Стили для option в обычных select */
+.list option {
+    background-color: #FFFBF1;
+    color: #380c0c;
+    padding: 12px 15px;
+    font-family: 'Equilibrist';
+    font-size: 15px;
+    border-bottom: 1px solid #e7e2d3;
+    border-radius: 20px;
+}
+
+.list option:checked {
+    background-color: #922121;
+    color: #fffbf1;
+}
+
+.list option:hover {
+    background-color: #af2828;
+    color: #fffbf1;
+}
+
+/* Контейнер для даты */
+.date-picker {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Кастомный выпадающий список */
+.custom-select {
+    position: relative;
+    width: 350px;
+}
+
+.select-input {
+    width: 100% !important;
+    background-color: #FFFBF1;
+    border: none;
+    border-radius: 20px;
+    height: 50px;
+    padding: 0 50px 0 20px;
+    font-family: 'Equilibrist';
+    font-size: 16px;
+    color: #380c0c;
+    outline: none;
+    transition: all 0.3s ease;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23922121' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='6 9 12 15 18 9'%3E%3C/polygon%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    background-size: 16px;
+}
+
+.select-input:focus {
+    border-color: #af2828;
+    box-shadow: 0 0 5px rgba(175, 40, 40, 0.3);
+}
+
+.custom-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #FFFBF1;
+    border: none;
+    border-top: none;
+    border-radius: 0 0 20px 20px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-left: 25px;
+}
+
+.custom-select.active .custom-options {
+    display: block;
+}
+
+.option {
+    padding: 12px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #e7e2d3;
+    font-family: 'Equilibrist';
+    color: #380c0c;
+    transition: all 0.2s ease;
+}
+
+.option:hover {
+    background-color: #922121;
+    color: #fffbf1;
+}
+
+.option:last-child {
+    border-bottom: none;
+}
+
+/* Стили для выбора способа оплаты */
+.payment-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+}
+
+.payment-radio {
+    display: none; /* Скрываем стандартные радиокнопки */
+}
+
+.payment-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-family: 'Equilibrist';
+    font-size: 18px;
+    color: #380c0c;
+    transition: all 0.3s ease;
+    padding: 10px 15px;
+    border-radius: 15px;
+    border: 2px solid transparent;
+}
+
+.payment-label:hover {
+    background-color: #f8f5e9;
+}
+
+.radio-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #922121;
+    border-radius: 50%;
+    margin-right: 12px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.payment-radio:checked + .payment-label .radio-custom {
+    border-color: #af2828;
+    background-color: #af2828;
+}
+
+.payment-radio:checked + .payment-label .radio-custom::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background-color: #fffbf1;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.payment-radio:checked + .payment-label {
+    background-color: #fffbf1;
+    border-color: #922121;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Подвал */
+.footer-box {
+    background-color: #af2828;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.footer-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 100px; 
+}
+
+.footer-columns {
+    display: flex;
+    gap: 150px;
+    margin-right: 520px;
+}
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-column li {
+    font-weight: bold;
+    margin-bottom: 10px;
+    list-style: none;
+}
+
+.footer-column ul {
+    margin: 5px 0;
+    list-style: none;
+    padding: 0;
+}
+
+.footer-column a {
+    color: inherit !important;
+    text-decoration: none !important;
+}
+
+.footer-column a:hover,
+.footer-column a:focus,
+.footer-column a:active {
+    color: inherit !important;
+    text-decoration: none !important;
+}
+
+/* Общие стили для всех ссылок */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+a:hover, a:focus, a:active {
+    text-decoration: none;
+    color: inherit;
+}

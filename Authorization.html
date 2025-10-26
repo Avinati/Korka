@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Authorization.css">
+    <title>Авторизация</title>
+</head>
+<body>
+    <div class="main-container">
+        <div class="somthing-container">
+            <h2 class="t1">Авторизация</h2>
+        </div>
+        <div class="register-form">
+            <form id="loginForm">
+                <div class="input-group">
+                    <input 
+                        placeholder="Email" 
+                        type="email" 
+                        class="input-field"
+                        id="email"
+                        required
+                    />
+                </div>
+
+                <div class="input-group">
+                    <input 
+                        placeholder="Пароль" 
+                        type="password" 
+                        class="input-field"
+                        id="password"
+                        required
+                        minlength="6"
+                    />
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">Войти</button>
+                
+                <div class="login-section">
+                    <span class="login-text">Нет аккаунта? </span>
+                    <a href="Registration.html" class="login-link">Зарегистрироваться!</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Проверяем, не авторизован ли пользователь уже
+            checkAuthStatus();
+
+            function showNotification(message, isSuccess = false) {
+                const existingNotification = document.querySelector('.notification');
+                if (existingNotification) {
+                    existingNotification.remove();
+                }
+
+                const notification = document.createElement('div');
+                notification.className = `notification ${isSuccess ? 'success' : 'error'}`;
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 20px;
+                    border-radius: 5px;
+                    color: white;
+                    font-weight: bold;
+                    z-index: 1000;
+                    max-width: 300px;
+                    transition: all 0.3s ease;
+                    background-color: ${isSuccess ? '#4CAF50' : '#f44336'};
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                `;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateX(100px)';
+                    setTimeout(() => notification.remove(), 300);
+                }, 5000);
+            }
+
+            function isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+
+            function setButtonState(isLoading) {
+                if (isLoading) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Вход...';
+                    submitBtn.style.opacity = '0.7';
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Войти';
+                    submitBtn.style.opacity = '1';
+                }
+            }
+
+            function checkAuthStatus() {
+                const isAuthenticated = localStorage.getItem('isAuthenticated');
+                if (isAuthenticated === 'true') {
+                    console.log('Пользователь уже авторизован');
+                    // Можно показать сообщение или перенаправить
+                    showNotification('Вы уже авторизованы!', true);
+                }
+            }
+
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const email = emailInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                if (!email) {
+                    showNotification('Введите email');
+                    emailInput.focus();
+                    return;
+                }
+
+                if (!isValidEmail(email)) {
+                    showNotification('Введите корректный email');
+                    emailInput.focus();
+                    return;
+                }
+
+                if (!password) {
+                    showNotification('Введите пароль');
+                    passwordInput.focus();
+                    return;
+                }
+
+                if (password.length < 6) {
+                    showNotification('Пароль должен содержать минимум 6 символов');
+                    passwordInput.focus();
+                    return;
+                }
+
+                setButtonState(true);
+
+                try {
+                    const response = await fetch('http://localhost:3006/auth', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            email: email,
+                            password: password
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+    showNotification('Успешный вход!', true);
+    
+    // Сохраняем полные данные пользователя
+    const userData = result.user;
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('isAuthenticated', 'true');
+    localStorage.setItem('userId', userData.user_id.toString());
+    localStorage.setItem('userName', userData.name || '');
+    localStorage.setItem('userEmail', userData.email || '');
+    localStorage.setItem('userRole', userData.role || 'user');
+
+    console.log('✅ Данные пользователя сохранены в localStorage:');
+    console.log('user_id:', userData.user_id);
+    console.log('name:', userData.name);
+    console.log('email:', userData.email);
+
+    // Проверяем, что данные сохранились
+    setTimeout(() => {
+        console.log('🔍 Проверка сохраненных данных:');
+        console.log('localStorage userId:', localStorage.getItem('userId'));
+        console.log('localStorage isAuthenticated:', localStorage.getItem('isAuthenticated'));
+    }, 100);
+
+    // Перенаправляем на главную страницу
+    setTimeout(() => {
+        window.location.href = 'Main.html';
+    }, 1000);
+
+} else {
+    showNotification(result.message);
+}
+                } catch (error) {
+                    console.error('❌ Ошибка при авторизации:', error);
+                    showNotification('Ошибка соединения с сервером');
+                } finally {
+                    setButtonState(false);
+                }
+            });
+
+            emailInput.addEventListener('blur', function() {
+                const email = this.value.trim();
+                if (email && !isValidEmail(email)) {
+                    this.style.borderColor = '#f44336';
+                } else {
+                    this.style.borderColor = '';
+                }
+            });
+
+            passwordInput.addEventListener('input', function() {
+                if (this.value.length > 0 && this.value.length < 6) {
+                    this.style.borderColor = '#f44336';
+                } else {
+                    this.style.borderColor = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
