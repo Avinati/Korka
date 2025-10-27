@@ -70,7 +70,7 @@
             <span class="close">&times;</span>
             <h3>Оставить отзыв</h3>
             <div class="review-form">
-                <p><strong>Специальность:</strong> <span id="modalSpecialty"></span></p>
+                <p><strong>Наименование курса:</strong> <span id="modalSpecialty"></span></p>
                 <p><strong>Дата начала:</strong> <span id="modalStartDate"></span></p>
                 
                 <div class="rating-section">
@@ -245,7 +245,7 @@
                 appDiv.innerHTML = `
                     <div class="app-details">
                         <div class="specialty-row">
-                            <p><strong>Специальность:</strong> ${application.course_name}</p>
+                            <p><strong>Наименование курса:</strong> ${application.course_name}</p>
                             <span class="app-status ${statusClass}">${this.getStatusText(application.status)}</span>
                         </div>
                         <p><strong>Дата подачи:</strong> ${new Date(application.created_at).toLocaleDateString('ru-RU')}</p>

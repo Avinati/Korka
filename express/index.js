@@ -26,13 +26,15 @@ app.get('/check-db', async (req, res) => {
 });
 
 // Регистрация пользователя
+// Регистрация пользователя
 app.post('/reg', async (req, res) => {
     console.log('📨 Получен запрос на регистрацию:', req.body);
     
     const { 
         name, 
-        surename, 
-        nick, 
+        surname, 
+        patronymic, 
+        login, 
         email, 
         phone, 
         password, 
@@ -41,10 +43,63 @@ app.post('/reg', async (req, res) => {
         notifications 
     } = req.body;
 
-    if (!name || !surename || !nick || !email || !phone || !password) {
+    // Проверка обязательных полей
+    if (!name || !surname || !login || !email || !phone || !password) {
         return res.json({ 
             success: false, 
             message: 'Все поля обязательны для заполнения' 
+        });
+    }
+
+    // Валидация логина (латиница и цифры, минимум 6 символов)
+    const loginRegex = /^[a-zA-Z0-9]{6,}$/;
+    if (!loginRegex.test(login)) {
+        return res.json({ 
+            success: false, 
+            message: 'Логин должен содержать только латиницу и цифры, минимум 6 символов' 
+        });
+    }
+
+    // Валидация ФИО (только кириллица и пробелы)
+    const cyrillicRegex = /^[А-Яа-яЁё\s]+$/;
+    if (!cyrillicRegex.test(name) || !cyrillicRegex.test(surname)) {
+        return res.json({ 
+            success: false, 
+            message: 'ФИО должно содержать только кириллические символы и пробелы' 
+        });
+    }
+
+    // Валидация отчества (если указано)
+    if (patronymic && !cyrillicRegex.test(patronymic)) {
+        return res.json({ 
+            success: false, 
+            message: 'Отчество должно содержать только кириллические символы и пробелы' 
+        });
+    }
+
+    // Валидация пароля (минимум 8 символов)
+    if (password.length < 8) {
+        return res.json({ 
+            success: false, 
+            message: 'Пароль должен содержать минимум 8 символов' 
+        });
+    }
+
+    // Валидация телефона (новый формат)
+    const phoneRegex = /^8\s?\(\d{3}\)\s?\d{3}-\d{2}-\d{2}$/;
+    if (!phoneRegex.test(phone)) {
+        return res.json({ 
+            success: false, 
+            message: 'Неверный формат телефона. Используйте формат: 8 (999) 123-45-67' 
+        });
+    }
+
+    // Валидация email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.json({ 
+            success: false, 
+            message: 'Неверный формат email' 
         });
     }
 
@@ -57,23 +112,23 @@ app.post('/reg', async (req, res) => {
 
     try {
         const [existingUsers] = await pool.execute(
-            'SELECT user_id FROM users WHERE email = ? OR nick = ?',
-            [email, nick]
+            'SELECT user_id FROM users WHERE email = ? OR login = ? OR phone = ?',
+            [email, login, phone]
         );
 
         if (existingUsers.length > 0) {
             return res.json({ 
                 success: false, 
-                message: 'Пользователь с таким email или никнеймом уже существует' 
+                message: 'Пользователь с таким email, логином или телефоном уже существует' 
             });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const [result] = await pool.execute(
-            `INSERT INTO users (name, surname, nick, email, phone, password, role) 
-             VALUES (?, ?, ?, ?, ?, ?, 'user')`,
-            [name, surename, nick, email, phone, hashedPassword]
+            `INSERT INTO users (name, surname, patronymic, login, email, phone, password, role) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, 'user')`,
+            [name, surname, patronymic || null, login, email, phone, hashedPassword]
         );
 
         console.log('✅ Пользователь создан с ID:', result.insertId);
@@ -91,8 +146,8 @@ app.post('/reg', async (req, res) => {
         if (error.code === 'ER_DUP_ENTRY') {
             if (error.sqlMessage.includes('email')) {
                 errorMessage = 'Пользователь с таким email уже существует';
-            } else if (error.sqlMessage.includes('nick')) {
-                errorMessage = 'Пользователь с таким никнеймом уже существует';
+            } else if (error.sqlMessage.includes('login')) {
+                errorMessage = 'Пользователь с таким логином уже существует';
             } else if (error.sqlMessage.includes('phone')) {
                 errorMessage = 'Пользователь с таким телефоном уже существует';
             }
@@ -219,7 +274,7 @@ app.post('/auth', async (req, res) => {
 
     try {
         const [users] = await pool.execute(
-            'SELECT user_id, name, surname, nick, email, password, role FROM users WHERE email = ?',
+            'SELECT user_id, name, surname, login, email, password, role FROM users WHERE email = ?',
             [email]
         );
 
@@ -443,7 +498,7 @@ app.post('/admin-auth', async (req, res) => {
                 user_id: 0,
                 name: 'Admin',
                 surname: 'System',
-                nick: 'admin',
+                login: 'admin',
                 email: 'admin@system',
                 role: 'admin'
             };
@@ -457,7 +512,7 @@ app.post('/admin-auth', async (req, res) => {
 
         // Стандартная проверка через базу данных
         const [users] = await pool.execute(
-            'SELECT user_id, name, surname, nick, email, password, role FROM users WHERE email = ?',
+            'SELECT user_id, name, surname, login, email, password, role FROM users WHERE email = ?',
             [email]
         );
 
@@ -522,7 +577,7 @@ app.post('/admin-login', async (req, res) => {
                 user_id: 0,
                 name: 'Admin',
                 surname: 'System',
-                nick: 'admin',
+                login: 'admin',
                 email: 'admin@system',
                 role: 'admin'
             };
@@ -538,7 +593,7 @@ app.post('/admin-login', async (req, res) => {
         const [users] = await pool.execute(
             `SELECT user_id, name, surname, email, role, password 
              FROM users 
-             WHERE (email = ? OR nick = ?) AND role = 'admin'`,
+             WHERE (email = ? OR login = ?) AND role = 'admin'`,
             [username, username]
         );
 
@@ -765,7 +820,7 @@ app.get('/admin-test', (req, res) => {
 // Получение всех пользователей
 app.get('/users', async (req, res) => {
     try {
-        const [users] = await pool.execute('SELECT user_id, name, surname, nick, email, phone, created_at FROM users');
+        const [users] = await pool.execute('SELECT user_id, name, surname, login, email, phone, created_at FROM users');
         res.json({ success: true, users });
     } catch (error) {
         console.error('Ошибка при получении пользователей:', error);

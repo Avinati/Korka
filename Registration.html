@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация</title>
     <link rel="stylesheet" href="Registration.css">
+    <title>Регистрация</title>
 </head>
 <body>
     <div class="main-container">
-        <div class="somthing-container">
-            <h2 class="t1">Регистрация</h2>
+        <div class="header-container">
+            <h2 class="title">Регистрация</h2>
         </div>
         <div class="register-form">
             <form id="registrationForm">
@@ -19,6 +19,8 @@
                         type="text" 
                         class="input-field"
                         name="name"
+                        pattern="^[А-Яа-яЁё\s\-]+$"
+                        title="Имя должно содержать только русские буквы, пробелы и дефисы"
                         required
                     />
                 </div>
@@ -28,17 +30,32 @@
                         placeholder="Фамилия"
                         type="text" 
                         class="input-field"
-                        name="surename"
+                        name="surname"
+                        pattern="^[А-Яа-яЁё\s\-]+$"
+                        title="Фамилия должна содержать только русские буквы, пробелы и дефисы"
                         required
                     />
                 </div>
                 
                 <div class="input-group">
                     <input 
-                        placeholder="Никнейм" 
+                        placeholder="Отчество"
                         type="text" 
                         class="input-field"
-                        name="nick"
+                        name="patronymic"
+                        pattern="^[А-Яа-яЁё\s\-]*$"
+                        title="Отчество должно содержать только русские буквы, пробелы и дефисы"
+                    />
+                </div>
+                
+                <div class="input-group">
+                    <input 
+                        placeholder="Логин" 
+                        type="text" 
+                        class="input-field"
+                        name="login"
+                        pattern="^[A-Za-z0-9]{6,}$"
+                        title="Логин должен содержать только английские буквы и цифры, минимум 6 символов"
                         required
                     />
                 </div>
@@ -58,9 +75,9 @@
                         type="tel" 
                         id="phone" 
                         name="phone" 
-                        placeholder="+7 (999) 123-45-67" 
-                        pattern="^\+7\s?\(\d{3}\)\s?\d{3}-\d{2}-\d{2}$"
-                        title="Формат: +7 (999) 123-45-67"
+                        placeholder="8 (999) 123-45-67" 
+                        pattern="^8\s?\(\d{3}\)\s?\d{3}-\d{2}-\d{2}$"
+                        title="Формат: 8 (999) 123-45-67"
                         required
                         class="input-field"
                     />
@@ -72,7 +89,7 @@
                         type="password" 
                         class="input-field"
                         name="password"
-                        minlength="6"
+                        minlength="8"
                         required
                     />
                 </div>
@@ -83,6 +100,7 @@
                         type="password" 
                         class="input-field"
                         name="confirmPassword"
+                        minlength="8"
                         required
                     />
                 </div>
@@ -137,8 +155,9 @@
             const formData = new FormData(this);
             const data = {
                 name: formData.get('name'),
-                surename: formData.get('surename'),
-                nick: formData.get('nick'),
+                surname: formData.get('surname'),
+                patronymic: formData.get('patronymic'),
+                login: formData.get('login'),
                 email: formData.get('email'),
                 phone: formData.get('phone'),
                 password: formData.get('password'),
@@ -146,6 +165,30 @@
                 privacyPolicy: formData.get('privacyPolicy') === 'on',
                 notifications: formData.get('notifications') === 'on'
             };
+
+            // Валидация ФИО (только русские символы)
+            const cyrillicRegex = /^[А-Яа-яЁё\s\-]+$/;
+            if (!cyrillicRegex.test(data.name)) {
+                showMessage('Имя должно содержать только русские буквы, пробелы и дефисы', 'error');
+                return;
+            }
+
+            if (!cyrillicRegex.test(data.surname)) {
+                showMessage('Фамилия должна содержать только русские буквы, пробелы и дефисы', 'error');
+                return;
+            }
+
+            if (data.patronymic && !cyrillicRegex.test(data.patronymic)) {
+                showMessage('Отчество должно содержать только русские буквы, пробелы и дефисы', 'error');
+                return;
+            }
+
+            // Валидация логина (только английские символы и цифры, минимум 6)
+            const loginRegex = /^[A-Za-z0-9]{6,}$/;
+            if (!loginRegex.test(data.login)) {
+                showMessage('Логин должен содержать только английские буквы и цифры, минимум 6 символов', 'error');
+                return;
+            }
 
             // Проверка паролей
             const password = formData.get('password');
@@ -156,8 +199,22 @@
                 return;
             }
 
-            if (password.length < 6) {
-                showMessage('Пароль должен содержать минимум 6 символов', 'error');
+            if (password.length < 8) {
+                showMessage('Пароль должен содержать минимум 8 символов', 'error');
+                return;
+            }
+
+            // Валидация email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(data.email)) {
+                showMessage('Неверный формат email', 'error');
+                return;
+            }
+
+            // Валидация телефона
+            const phoneRegex = /^8\s?\(\d{3}\)\s?\d{3}-\d{2}-\d{2}$/;
+            if (!phoneRegex.test(data.phone)) {
+                showMessage('Неверный формат телефона. Используйте формат: 8 (999) 123-45-67', 'error');
                 return;
             }
 
@@ -175,8 +232,7 @@
                 if (result.success) {
                     showMessage('Регистрация прошла успешно! Автоматический вход...', 'success');
                     
-                    // После успешной регистрации автоматически логиним пользователя
-                    // Выполняем автоматический вход
+                    // Автоматический вход после регистрации
                     try {
                         const loginResponse = await fetch('http://localhost:3006/auth', {
                             method: 'POST',
@@ -201,15 +257,15 @@
 
                             console.log('✅ Автоматический вход выполнен:', loginResult.user);
                             
-                            // Очистка формы после успешной регистрации
+                            // Очистка формы
                             document.getElementById('registrationForm').reset();
                             
-                            // Перенаправление на главную страницу через 2 секунды
+                            // Перенаправление на главную страницу
                             setTimeout(() => {
                                 window.location.href = 'Main.html';
                             }, 2000);
                         } else {
-                            // Если автоматический вход не удался, все равно сохраняем ID
+                            // Если автоматический вход не удался
                             localStorage.setItem('isAuthenticated', 'true');
                             localStorage.setItem('userId', result.userId);
                             showMessage('Регистрация успешна! Войдите в систему.', 'success');
@@ -219,7 +275,6 @@
                         }
                     } catch (loginError) {
                         console.error('Ошибка автоматического входа:', loginError);
-                        // Сохраняем хотя бы ID пользователя
                         localStorage.setItem('userId', result.userId);
                         showMessage('Регистрация успешна! Войдите в систему.', 'success');
                         setTimeout(() => {
@@ -244,18 +299,49 @@
             messageDiv.style.border = type === 'success' ? '1px solid #c3e6cb' : '1px solid #f5c6cb';
         }
 
-        // Маска для телефона
+        // Маска для телефона (формат 8 (999) 123-45-67)
         document.getElementById('phone').addEventListener('input', function(e) {
             let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
-            e.target.value = '+7' + (x[2] ? ' (' + x[2] : '') + (x[3] ? ') ' + x[3] : '') + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
+            e.target.value = (x[1] ? x[1] : '') + (x[2] ? ' (' + x[2] : '') + (x[3] ? ') ' + x[3] : '') + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
         });
 
-        // Проверяем, не авторизован ли пользователь
+        // Проверка авторизации при загрузке
         document.addEventListener('DOMContentLoaded', function() {
             const isAuthenticated = localStorage.getItem('isAuthenticated');
             if (isAuthenticated === 'true') {
                 console.log('Пользователь уже авторизован');
-                // Можно предложить перейти на главную
+                // Можно добавить редирект или скрыть форму
+            }
+        });
+
+        // Валидация в реальном времени
+        document.querySelector('input[name="name"]').addEventListener('input', function(e) {
+            const value = e.target.value;
+            const regex = /^[А-Яа-яЁё\s\-]*$/;
+            if (!regex.test(value)) {
+                this.style.borderColor = 'red';
+            } else {
+                this.style.borderColor = '';
+            }
+        });
+
+        document.querySelector('input[name="surname"]').addEventListener('input', function(e) {
+            const value = e.target.value;
+            const regex = /^[А-Яа-яЁё\s\-]*$/;
+            if (!regex.test(value)) {
+                this.style.borderColor = 'red';
+            } else {
+                this.style.borderColor = '';
+            }
+        });
+
+        document.querySelector('input[name="login"]').addEventListener('input', function(e) {
+            const value = e.target.value;
+            const regex = /^[A-Za-z0-9]*$/;
+            if (!regex.test(value)) {
+                this.style.borderColor = 'red';
+            } else {
+                this.style.borderColor = '';
             }
         });
     </script>
