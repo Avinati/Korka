@@ -5,6 +5,240 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель администратора</title>
     <link rel="stylesheet" href="AdminPanel.css">
+    <style>
+        
+th {
+    position: relative;
+    user-select: none;
+}
+
+.sort-indicator {
+    margin-left: 5px;
+    font-size: 12px;
+    opacity: 0.5;
+}
+
+th.sort-asc .sort-indicator::after {
+    content: " ↑";
+    opacity: 1;
+    font-weight: bold;
+}
+
+th.sort-desc .sort-indicator::after {
+    content: " ↓";
+    opacity: 1;
+    font-weight: bold;
+}
+
+th:hover {
+    background-color: #f8f9fa;
+}
+
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0;
+    padding: 20px;
+    background: #e7e2d3;
+    border-radius: 10px;
+    border: 1px solid #922121;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.pagination-btn {
+    padding: 10px 16px;
+    border: 2px solid #922121;
+    background: #fffbf1;
+    color: #380c0c;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    min-width: 44px;
+    text-align: center;
+    font-family: 'Equilibrist';
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: #922121;
+    color: #fffbf1;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(146, 33, 33, 0.3);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.pagination-btn.active {
+    background: #af2828;
+    color: #fffbf1;
+    border-color: #af2828;
+    font-weight: bold;
+}
+
+.page-numbers {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.pagination-ellipsis {
+    padding: 10px 5px;
+    color: #380c0c;
+    font-weight: bold;
+}
+
+.pagination-info {
+    margin-left: 20px;
+    color: #380c0c;
+    font-size: 14px;
+    font-weight: 500;
+    background: #fffbf1;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid #922121;
+}
+
+
+.status-group-header {
+    background: #af2828;
+    color: white;
+    font-size: 16px;
+}
+
+.group-header {
+    padding: 15px 20px !important;
+    font-size: 16px;
+    text-align: left;
+}
+
+.group-count {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-left: 10px;
+}
+
+.application-row {
+    transition: all 0.3s ease;
+}
+
+.application-row:hover {
+    background-color: #f5f1e3;
+    transform: translateX(5px);
+}
+
+.status-new {
+    background: #ffcc00;
+    color: #380c0c;
+}
+
+.status-in-progress {
+    background: #0066cc;
+    color: white;
+}
+
+.status-completed {
+    background: #00aa00;
+    color: black;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
+.actions-cell {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-family: 'Equilibrist';
+}
+
+.start-btn {
+    background: #af2828;
+    color: white;
+}
+
+.start-btn:hover {
+    background: #922121;
+    transform: translateY(-1px);
+}
+
+.complete-btn {
+    background: #0066cc;
+    color: white;
+}
+
+.complete-btn:hover {
+    background: #0055aa;
+    transform: translateY(-1px);
+}
+
+.cancel-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background: #545b62;
+    transform: translateY(-1px);
+}
+
+.completed-text {
+    color: #922121;
+    font-style: italic;
+    font-weight: normal;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .pagination {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .page-numbers {
+        order: -1;
+    }
+    
+    .pagination-info {
+        margin-left: 0;
+        text-align: center;
+    }
+    
+    .actions-cell {
+        flex-direction: column;
+    }
+    
+    .action-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+    </style>
 </head>
 <body>
 <!-- Чердак -->
@@ -49,11 +283,26 @@
             <table class="applications-table">
                 <thead>
                     <tr>
-                        <th>ФИО</th>
-                        <th>Email</th>
-                        <th>Программа</th>
-                        <th>Дата подачи</th>
-                        <th>Статус</th>
+                        <th data-sort="name" onclick="changeSort('name')" style="cursor: pointer;">
+                            ФИО 
+                            <span class="sort-indicator">↕</span>
+                        </th>
+                        <th data-sort="email" onclick="changeSort('email')" style="cursor: pointer;">
+                            Email 
+                            <span class="sort-indicator">↕</span>
+                        </th>
+                        <th data-sort="course" onclick="changeSort('course')" style="cursor: pointer;">
+                            Программа 
+                            <span class="sort-indicator">↕</span>
+                        </th>
+                        <th data-sort="date" onclick="changeSort('date')" style="cursor: pointer;">
+                            Дата подачи 
+                            <span class="sort-indicator">↕</span>
+                        </th>
+                        <th data-sort="status" onclick="changeSort('status')" style="cursor: pointer;">
+                            Статус 
+                            <span class="sort-indicator">↕</span>
+                        </th>
                         <th>Действия</th>
                     </tr>
                 </thead>
@@ -61,6 +310,24 @@
                     <!-- Данные будут заполнены через JavaScript -->
                 </tbody>
             </table>
+
+            <!-- Пагинация -->
+            <div id="pagination" class="pagination hidden">
+                <button id="firstPage" class="pagination-btn" onclick="goToPage(1)">Первая</button>
+                <button id="prevPage" class="pagination-btn" onclick="goToPage(currentPage - 1)">Назад</button>
+                
+                <div id="pageNumbers" class="page-numbers">
+                    <!-- Номера страниц будут генерироваться динамически -->
+                </div>
+                
+                <button id="nextPage" class="pagination-btn" onclick="goToPage(currentPage + 1)">Вперед</button>
+                <button id="lastPage" class="pagination-btn" onclick="goToPage(totalPages)">Последняя</button>
+                
+                <div class="pagination-info">
+                    Страница <span id="currentPage">1</span> из <span id="totalPages">1</span>
+                    (<span id="totalItems">0</span> заявок)
+                </div>
+            </div>
         </div>
     </div>
 <!-- Подвал -->
@@ -98,6 +365,14 @@
     <script>
         let currentAdmin = null;
         const API_BASE_URL = 'http://localhost:3006';
+        
+        // Переменные для пагинации и сортировки
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let totalPages = 1;
+        let totalItems = 0;
+        let allApplications = [];
+        let currentSort = { field: 'status', direction: 'asc' };
 
         async function login() {
             const username = document.getElementById('username').value;
@@ -136,9 +411,11 @@
             currentAdmin = null;
             document.getElementById('loginForm').classList.remove('hidden');
             document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('pagination').classList.add('hidden');
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
             document.getElementById('loginError').textContent = '';
+            currentPage = 1;
         }
 
         // Функция загрузки заявок с сервера
@@ -150,7 +427,19 @@
 
                 if (result.success) {
                     console.log('✅ Заявки загружены:', result.applications.length);
-                    displayApplications(result.applications);
+                    allApplications = sortApplications(result.applications);
+                    totalItems = allApplications.length;
+                    totalPages = Math.ceil(totalItems / itemsPerPage);
+                    
+                    if (totalItems > 0) {
+                        document.getElementById('pagination').classList.remove('hidden');
+                    } else {
+                        document.getElementById('pagination').classList.add('hidden');
+                    }
+                    
+                    displayApplicationsForCurrentPage();
+                    updatePagination();
+                    updateSortIndicators();
                 } else {
                     console.error('❌ Ошибка при загрузке заявок:', result.message);
                     showError('Ошибка при загрузке заявок');
@@ -161,24 +450,107 @@
             }
         }
 
-        // Функция отображения заявок
-        function displayApplications(applications) {
+        // Функция сортировки заявок
+        function sortApplications(applications) {
+            return applications.sort((a, b) => {
+                let valueA, valueB;
+                
+                switch (currentSort.field) {
+                    case 'status':
+                        valueA = getStatusOrder(a.status);
+                        valueB = getStatusOrder(b.status);
+                        break;
+                    case 'name':
+                        valueA = `${a.user_name} ${a.user_surname}`.toLowerCase();
+                        valueB = `${b.user_name} ${b.user_surname}`.toLowerCase();
+                        break;
+                    case 'email':
+                        valueA = a.user_email.toLowerCase();
+                        valueB = b.user_email.toLowerCase();
+                        break;
+                    case 'course':
+                        valueA = a.course_name.toLowerCase();
+                        valueB = b.course_name.toLowerCase();
+                        break;
+                    case 'date':
+                        valueA = new Date(a.created_at);
+                        valueB = new Date(b.created_at);
+                        break;
+                    default:
+                        valueA = a[currentSort.field];
+                        valueB = b[currentSort.field];
+                }
+                
+                if (currentSort.direction === 'asc') {
+                    return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
+                } else {
+                    return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
+                }
+            });
+        }
+
+        // Порядок сортировки статусов
+        function getStatusOrder(status) {
+            const statusOrder = {
+                'new': 1,
+                'in_progress': 2,
+                'completed': 3
+            };
+            return statusOrder[status] || 4;
+        }
+
+        // Функция изменения сортировки
+        function changeSort(field) {
+            if (currentSort.field === field) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.field = field;
+                currentSort.direction = 'asc';
+            }
+            
+            allApplications = sortApplications(allApplications);
+            displayApplicationsForCurrentPage();
+            updateSortIndicators();
+        }
+
+        // Функция обновления индикаторов сортировки в таблице
+        function updateSortIndicators() {
+            document.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+            
+            const activeTh = document.querySelector(`th[data-sort="${currentSort.field}"]`);
+            if (activeTh) {
+                activeTh.classList.add(`sort-${currentSort.direction}`);
+            }
+        }
+
+        // Функция отображения заявок для текущей страницы
+        function displayApplicationsForCurrentPage() {
             const tableBody = document.getElementById('applicationsTableBody');
             tableBody.innerHTML = '';
 
-            // Группируем заявки по статусам
+            if (allApplications.length === 0) {
+                const emptyRow = document.createElement('tr');
+                emptyRow.innerHTML = '<td colspan="6" style="text-align: center; padding: 20px;">Нет заявок для отображения</td>';
+                tableBody.appendChild(emptyRow);
+                return;
+            }
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+            const currentPageApplications = allApplications.slice(startIndex, endIndex);
+
             const groupedApplications = {
-                'new': applications.filter(app => app.status === 'new'),
-                'in_progress': applications.filter(app => app.status === 'in_progress'),
-                'completed': applications.filter(app => app.status === 'completed')
+                'new': currentPageApplications.filter(app => app.status === 'new'),
+                'in_progress': currentPageApplications.filter(app => app.status === 'in_progress'),
+                'completed': currentPageApplications.filter(app => app.status === 'completed')
             };
 
-            // Отображаем заявки по группам
             Object.keys(groupedApplications).forEach(status => {
                 const statusApplications = groupedApplications[status];
                 
                 if (statusApplications.length > 0) {
-                    // Добавляем заголовок группы
                     const groupHeader = document.createElement('tr');
                     groupHeader.className = 'status-group-header';
                     groupHeader.innerHTML = `
@@ -189,7 +561,6 @@
                     `;
                     tableBody.appendChild(groupHeader);
 
-                    // Добавляем заявки этой группы
                     statusApplications.forEach((app) => {
                         const row = document.createElement('tr');
                         row.className = `application-row status-${app.status}`;
@@ -223,49 +594,113 @@
                     });
                 }
             });
+        }
 
-            // Если нет заявок
-            if (applications.length === 0) {
-                const emptyRow = document.createElement('tr');
-                emptyRow.innerHTML = '<td colspan="6" style="text-align: center; padding: 20px;">Нет заявок для отображения</td>';
-                tableBody.appendChild(emptyRow);
+        // Функция обновления пагинации
+        function updatePagination() {
+            document.getElementById('currentPage').textContent = currentPage;
+            document.getElementById('totalPages').textContent = totalPages;
+            document.getElementById('totalItems').textContent = totalItems;
+
+            document.getElementById('firstPage').disabled = currentPage === 1;
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+            document.getElementById('lastPage').disabled = currentPage === totalPages;
+
+            const pageNumbersContainer = document.getElementById('pageNumbers');
+            pageNumbersContainer.innerHTML = '';
+
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            if (startPage > 1) {
+                addPageNumber(1);
+                if (startPage > 2) {
+                    addEllipsis();
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                addPageNumber(i);
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    addEllipsis();
+                }
+                addPageNumber(totalPages);
+            }
+
+            function addPageNumber(page) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `pagination-btn ${page === currentPage ? 'active' : ''}`;
+                pageBtn.textContent = page;
+                pageBtn.onclick = () => goToPage(page);
+                pageNumbersContainer.appendChild(pageBtn);
+            }
+
+            function addEllipsis() {
+                const ellipsis = document.createElement('span');
+                ellipsis.className = 'pagination-ellipsis';
+                ellipsis.textContent = '...';
+                pageNumbersContainer.appendChild(ellipsis);
             }
         }
 
-        
-async function changeStatus(applicationId, newStatus) {
-    if (!currentAdmin) {
-        alert('Ошибка: администратор не авторизован');
-        return;
-    }
-
-    try {
-        console.log(`🔄 Изменение статуса заявки ${applicationId} на ${newStatus}`);
-        
-        const response = await fetch(`${API_BASE_URL}/admin-applications/${applicationId}/status`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                newStatus: newStatus,
-                adminId: currentAdmin.user_id || 0 // Добавляем adminId
-            })
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            console.log('✅ Статус успешно изменен, перезагружаем заявки...');
-            await loadApplications();
-        } else {
-            alert('Ошибка при изменении статуса: ' + result.message);
+        // Функция перехода на страницу
+        function goToPage(page) {
+            if (page < 1 || page > totalPages || page === currentPage) {
+                return;
+            }
+            
+            currentPage = page;
+            displayApplicationsForCurrentPage();
+            updatePagination();
+            
+            document.querySelector('.applications-table').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
         }
-    } catch (error) {
-        console.error('Ошибка при изменении статуса:', error);
-        alert('Ошибка соединения с сервером');
-    }
-}
+
+        async function changeStatus(applicationId, newStatus) {
+            if (!currentAdmin) {
+                alert('Ошибка: администратор не авторизован');
+                return;
+            }
+
+            try {
+                console.log(`🔄 Изменение статуса заявки ${applicationId} на ${newStatus}`);
+                
+                const response = await fetch(`${API_BASE_URL}/admin-applications/${applicationId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        newStatus: newStatus,
+                        adminId: currentAdmin.user_id || 0
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    console.log('✅ Статус успешно изменен, перезагружаем заявки...');
+                    await loadApplications();
+                } else {
+                    alert('Ошибка при изменении статуса: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Ошибка при изменении статуса:', error);
+                alert('Ошибка соединения с сервером');
+            }
+        }
+
         // Вспомогательные функции
         function getStatusClass(status) {
             switch(status) {
@@ -301,6 +736,7 @@ async function changeStatus(applicationId, newStatus) {
             console.log('🚀 Инициализация админ-панели...');
             document.getElementById('loginForm').classList.remove('hidden');
             document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('pagination').classList.add('hidden');
         });
     </script>
 </body>
