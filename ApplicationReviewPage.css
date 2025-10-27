@@ -76,24 +76,49 @@ html, body
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 300px;
+    width: 250px;
     height: 50px;
     background: none;
     font-family:'Equilibrist';
-    font-size: 24px;
+    padding: 10px;
+    font-size: 18px;
     color: #380c0c;
     border-radius: 15px;
     border: 2px solid #922121;
     text-decoration: none;
     transition: all 0.3s ease;
+}
+
+.btn-logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 250px;
+    height: 75px;
+    background: none;
+    font-family:'Equilibrist';
+    padding: 10px;
+    font-size: 18px;
+    color: #380c0c;
+    border-radius: 15px;
+    border: 2px solid #922121;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn1 {
     margin-left: 220px;
 }
 
 .btn2 {
-    margin-left: 0;
+    margin-left: 10px; /* Уменьшено расстояние между btn1 и btn2 */
 }
 
-.btn1:hover, .btn2:hover{
+.btn-logout {
+    margin-left: 10px; /* Такое же расстояние как между btn1 и btn2 */
+}
+
+.btn1:hover, .btn2:hover, .btn-logout:hover{
     background: #922121;
     color: #fffbf1;
     border-radius: 15px;
@@ -334,6 +359,31 @@ html, body
 
 .rating-modal .star-modal:hover ~ .star-modal {
     color: #ddd;
+}
+
+.review-btn{
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: none;
+    font-family: 'Equilibrist';
+    font-size: 18px;
+    color: #380c0c;
+    border-radius: 15px;
+    border: 2px solid #922121;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.review-btn:hover {
+    background: #922121;
+    color: #fffbf1;
+    border-radius: 15px;
+    border: 2px solid #922121;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 /* Кнопка отправки отзыва */
