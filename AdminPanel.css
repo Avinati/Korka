@@ -396,6 +396,7 @@ th:hover {
 }
 
 .group-header {
+    background: #af2828;
     padding: 15px 20px !important;
     font-size: 16px;
     text-align: left;
@@ -417,7 +418,7 @@ th:hover {
 }
 
 .status-new {
-    background: #ffcc00;
+    background-color: #f5f1e3;
     color: #380c0c;
 }
 
@@ -448,6 +449,11 @@ th:hover {
 .status-badge.status-completed {
     background-color: #00aa00;
     color: #ffffff;
+}
+
+.status-badge.status-new {
+    background-color: #ffcc00;
+    color: #380c0c;
 }
 
 .actions-cell {
