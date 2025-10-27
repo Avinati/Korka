@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="AdminPanel.css">
 </head>
 <body>
-<!-- Чердак -->
+<!-- Хедер -->
     <div class="header-box">
         <div class="header-container">
             <a class="logo-container" href="Main.html" style="text-decoration: none; color: inherit;">
@@ -24,10 +24,9 @@
 
 <!-- Основной контент -->
     <div class="main-container">
-           <div class="somthing-container">
-        <h2 class="t1">Админ-панель:</h2>
-    </div>
-    <div id="loginForm" class="login-form">
+        <div class="somthing-container"></div>
+        
+        <div id="loginForm" class="login-form">
             <h2>Вход в панель администратора</h2>
             <input type="text" id="username" placeholder="Логин" required>
             <input type="password" id="password" placeholder="Пароль" required>
@@ -63,7 +62,8 @@
             </table>
         </div>
     </div>
-<!-- Подвал -->
+
+<!-- Футер -->
     <div class="footer-box">
         <div class="footer-container">
             <a class="logo-container" href="Main.html" style="text-decoration: none; color: inherit;">
@@ -105,13 +105,13 @@
             const errorDiv = document.getElementById('loginError');
             
             try {
-                const response = await fetch(`${API_BASE_URL}/admin-auth`, {
+                const response = await fetch(`${API_BASE_URL}/admin-login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        email: username,
+                        username: username,
                         password: password
                     })
                 });
@@ -142,25 +142,74 @@
         }
 
         // Функция загрузки заявок с сервера
-        async function loadApplications() {
-            try {
-                console.log('🔄 Загрузка заявок...');
-                const response = await fetch(`${API_BASE_URL}/admin-applications`);
-                const result = await response.json();
+    async function loadApplications() {
+    try {
+        console.log('🔄 Загрузка заявок...');
+        const response = await fetch(`${API_BASE_URL}/admin-applications`);
+        const result = await response.json();
 
-                if (result.success) {
-                    console.log('✅ Заявки загружены:', result.applications.length);
-                    displayApplications(result.applications);
-                } else {
-                    console.error('❌ Ошибка при загрузке заявок:', result.message);
-                    showError('Ошибка при загрузке заявок');
-                }
-            } catch (error) {
-                console.error('❌ Ошибка при загрузке заявок:', error);
-                showError('Ошибка соединения с сервером');
-            }
+        if (result.success) {
+            console.log('✅ Заявки загружены:', result.applications.length);
+            displayApplications(result.applications);
+            
+            // Добавляем уведомление об успешном обновлении
+            showNotification('Данные успешно обновлены', 'success');
+        } else {
+            console.error('❌ Ошибка при загрузке заявок:', result.message);
+            showError('Ошибка при загрузке заявок');
+            showNotification('Ошибка при загрузке заявок', 'error');
         }
+    } catch (error) {
+        console.error('❌ Ошибка при загрузке заявок:', error);
+        showError('Ошибка соединения с сервером');
+        showNotification('Ошибка соединения с сервером', 'error');
+    }
+}
 
+function showNotification(message, type = 'info') {
+    // Создаем элемент уведомления
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 4px;
+        color: white;
+        font-weight: bold;
+        z-index: 10000;
+        transition: opacity 0.3s;
+        opacity: 0;
+    `;
+    
+    // Устанавливаем цвет в зависимости от типа
+    if (type === 'success') {
+        notification.style.backgroundColor = '#4CAF50';
+    } else if (type === 'error') {
+        notification.style.backgroundColor = '#f44336';
+    } else {
+        notification.style.backgroundColor = '#2196F3';
+    }
+    
+    document.body.appendChild(notification);
+    
+    // Анимация появления
+    setTimeout(() => {
+        notification.style.opacity = '1';
+    }, 10);
+    
+    // Автоматическое скрытие через 3 секунды
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
         // Функция отображения заявок
         function displayApplications(applications) {
             const tableBody = document.getElementById('applicationsTableBody');
@@ -232,8 +281,7 @@
             }
         }
 
-        
-async function changeStatus(applicationId, newStatus) {
+      async function changeStatus(applicationId, newStatus) {
     if (!currentAdmin) {
         alert('Ошибка: администратор не авторизован');
         return;
@@ -249,7 +297,7 @@ async function changeStatus(applicationId, newStatus) {
             },
             body: JSON.stringify({
                 newStatus: newStatus,
-                adminId: currentAdmin.user_id || 0 // Добавляем adminId
+                adminId: currentAdmin.user_id
             })
         });
 
@@ -257,12 +305,16 @@ async function changeStatus(applicationId, newStatus) {
 
         if (result.success) {
             console.log('✅ Статус успешно изменен, перезагружаем заявки...');
-            await loadApplications();
+            // Добавляем небольшую задержку для гарантии обновления данных
+            setTimeout(async () => {
+                await loadApplications();
+            }, 100);
         } else {
+            console.error('❌ Ошибка при изменении статуса:', result.message);
             alert('Ошибка при изменении статуса: ' + result.message);
         }
     } catch (error) {
-        console.error('Ошибка при изменении статуса:', error);
+        console.error('❌ Ошибка при изменении статуса:', error);
         alert('Ошибка соединения с сервером');
     }
 }
