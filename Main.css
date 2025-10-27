@@ -1,260 +1,421 @@
-/* Основное */
-html, body
-{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    background-color: #fffbf1;
-    font-family:'Equilibrist';
-    color: #380c0c;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
+ html, body
+        {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #fffbf1;
+            font-family: Arial, sans-serif;
+            color: #380c0c;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
 
-/* Чердак */
-.header-box{
-    background-color: #af2828;
-    flex-direction: column;
-    height: 140px;
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-}
+        /* Чердак - фиксированная высота */
+        .header-box{
+            background-color: #af2828;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            width: 100%;
+        }
 
-.header-container {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
-    margin-top: 20px;
-}
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            height: 100%;
+        }
 
-.logo-container{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-left: 120px;
-    text-decoration: none;
-    color: inherit;
-}
+        .logo-container{
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            height: 100%;
+        }
 
-.logo{
-    align-items: center;
-    width: 150px;
-    height: 100px;
-}
+        .logo{
+            width: 100px;
+            height: 70px;
+        }
 
-.title{
-    justify-content: space-between;
-    align-items: center;
-    font-size: 36px;
-    font-weight: bold;
-    margin-top: -10px;
-    margin-left: 20px;
-    flex-grow: 1;
-}
+        .title-section {
+            display: flex;
+            flex-direction: column;
+            margin-left: 15px;
+        }
 
-.undertitle{
-    position: absolute;
-    font-size: 18px;
-    flex-grow: 2;
-    margin-top: 60px;
-    margin-left: 169px;
-}
+        .title{
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
 
-.buttons{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-right: 120px;
-}
+        .undertitle{
+            font-size: 14px;
+            margin: 5px 0 0 0;
+        }
 
-.btn1, .btn2 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 250px;
-    height: 50px;
-    background: none;
-    font-family:'Equilibrist';
-    padding: 10px;
-    font-size: 18px;
-    color: #380c0c;
-    border-radius: 15px;
-    border: 2px solid #922121;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
+        .buttons{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-.btn-logout {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 250px;
-    height: 75px;
-    background: none;
-    font-family:'Equilibrist';
-    padding: 10px;
-    font-size: 18px;
-    color: #380c0c;
-    border-radius: 15px;
-    border: 2px solid #922121;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
+        .btn1, .btn2, .btn-logout {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            background: none;
+            padding: 0 15px;
+            font-size: 14px;
+            color: #380c0c;
+            border-radius: 15px;
+            border: 2px solid #922121;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
 
-.btn1 {
-    margin-left: 220px;
-}
+        .btn1:hover, .btn2:hover, .btn-logout:hover{
+            background: #922121;
+            color: #fffbf1;
+            cursor: pointer;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
 
-.btn2 {
-    margin-left: 10px; /* Уменьшено расстояние между btn1 и btn2 */
-}
+        /* Основной контент */
+        .main-container{
+            border-radius: 30px;
+            margin: 20px auto;
+            height: auto;
+            background-color: #e7e2d3;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            padding: 20px;
+            flex: 1;
+            max-width: 1200px;
+            width: calc(100% - 40px);
+        }
 
-.btn-logout {
-    margin-left: 10px; /* Такое же расстояние как между btn1 и btn2 */
-}
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: auto;
+            margin-bottom: 30px;
+        }
 
-.btn1:hover, .btn2:hover, .btn-logout:hover{
-    background: #922121;
-    color: #fffbf1;
-    border-radius: 15px;
-    border: 2px solid #922121;
-    cursor: pointer;
-    text-decoration: none;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
+        /* Первая секция - изображение сверху, текст снизу */
+        .first-section {
+            gap: 20px;
+        }
 
-/* Основной контент */
-.main-container{
-    border-radius: 30px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    margin-left: 120px;
-    margin-right: 120px;
-    height: 800px;
-    background-color: #e7e2d3;
-    flex-shrink: 0;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    padding: 20px;
-}
+        .first-section .text1 {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            text-align: center;
+            order: 2;
+        }
 
-.content-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 45%;
-}
+        /* Вторая секция - текст сверху, изображение снизу */
+        .second-section {
+            gap: 20px;
+        }
 
-/* Первая секция - изображение слева, текст справа */
-.first-section {
-    gap: 30px;
-}
+        .second-section .text2 {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            text-align: center;
+            order: 1;
+        }
 
-.first-section .img1 {
-    width: 400px;
-    height: 350px;
-    border-radius: 10px;
-    flex-shrink: 0;
-    margin-right: 0;
-}
+        /* Стили для слайдера */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 250px;
+            overflow: hidden;
+            border-radius: 10px;
+            flex-shrink: 0;
+            order: 1;
+        }
 
-.first-section .text1 {
-    width: 50%;
-    padding: 10px;
-    font-size: 24px;
-    margin-left: 0;
-    flex: 1;
-}
+        .slider {
+            display: flex;
+            width: 400%; /* 4 изображения по 100% */
+            height: 100%;
+            transition: transform 0.5s ease-in-out;
+        }
 
-/* Вторая секция - текст слева, изображение справа */
-.second-section {
-    gap: 10px;
-    justify-content: space-between;
-}
+        .slide {
+            width: 100%;
+            height: 100%;
+            flex-shrink: 0;
+        }
 
-.second-section .img2 {
-    width: 400px;
-    height: 350px;
-    border-radius: 10px;
-    flex-shrink: 0;
-    margin-left: 0;
-}
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-.second-section .text2 {
-    width: 55%;
-    padding: 10px;
-    font-size: 24px;
-    margin-left: 90px;
-    flex: 1;
-}
+        .slider-controls {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
 
-/* Подвал */
-.footer-box {
-    background-color: #af2828;
-    height: 250px;
-    display: flex;
-    align-items: center;
-    margin-top: auto;
-    flex-shrink: 0;
-}
+        .slider-btn {
+            background-color: rgba(175, 40, 40, 0.7);
+            color: #fffbf1;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
 
-.footer-container {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    gap: 100px; 
-}
+        .slider-btn:hover {
+            background-color: rgba(146, 33, 33, 0.9);
+            transform: scale(1.1);
+        }
 
-.footer-columns {
-    display: flex;
-    gap: 150px;
-    margin-right: 520px;
-}
+        .slider-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
 
-.footer-column {
-    display: flex;
-    flex-direction: column;
-}
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-.footer-column li {
-    font-weight: bold;
-    margin-bottom: 10px;
-    list-style: none;
-}
+        .dot.active {
+            background-color: #af2828;
+            transform: scale(1.2);
+        }
 
-.footer-column ul {
-    margin: 5px 0;
-    list-style: none;
-    padding: 0;
-}
+        /* Подвал */
+        .footer-box {
+            background-color: #af2828;
+            height: auto;
+            display: flex;
+            align-items: center;
+            margin-top: auto;
+            flex-shrink: 0;
+        }
 
-.footer-column a {
-    color: inherit !important;
-    text-decoration: none !important;
-}
+        .footer-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-.footer-column a:hover,
-.footer-column a:focus,
-.footer-column a:active {
-    color: inherit !important;
-    text-decoration: none !important;
-}
+        .footer-columns {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
 
-/* Общие стили для всех ссылок */
-a {
-    text-decoration: none;
-    color: inherit;
-}
+        .footer-column {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
 
-a:hover, a:focus, a:active {
-    text-decoration: none;
-    color: inherit;
-}
+        .footer-column li {
+            font-weight: bold;
+            margin-bottom: 10px;
+            list-style: none;
+        }
+
+        .footer-column ul {
+            margin: 5px 0;
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-column a {
+            color: inherit !important;
+            text-decoration: none !important;
+        }
+
+        .footer-column a:hover,
+        .footer-column a:focus,
+        .footer-column a:active {
+            color: inherit !important;
+            text-decoration: none !important;
+        }
+
+        /* Общие стили для всех ссылок */
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        a:hover, a:focus, a:active {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Медиа-запросы для адаптивности */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                justify-content: center;
+                padding: 10px 20px;
+            }
+            
+            .logo-container {
+                margin-bottom: 10px;
+            }
+            
+            .buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .btn1, .btn2, .btn-logout {
+                font-size: 12px;
+                padding: 0 10px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .logo{
+                width: 120px;
+                height: 80px;
+            }
+            
+            .title{
+                font-size: 28px;
+            }
+            
+            .undertitle{
+                font-size: 16px;
+            }
+            
+            .btn1, .btn2, .btn-logout {
+                height: 50px;
+                font-size: 16px;
+                padding: 0 20px;
+            }
+            
+            .content-section {
+                flex-direction: row;
+            }
+            
+            .first-section .text1 {
+                width: 50%;
+                text-align: left;
+                order: 2;
+            }
+            
+            .second-section .text2 {
+                width: 50%;
+                text-align: left;
+                margin-left: 0;
+                order: 1;
+            }
+            
+            .slider-container {
+                width: 45%;
+                height: 300px;
+            }
+            
+            .footer-container {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            
+            .footer-columns {
+                flex-direction: row;
+                gap: 50px;
+                margin-right: 0;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .logo {
+                width: 150px;
+                height: 100px;
+            }
+            
+            .title {
+                font-size: 36px;
+            }
+            
+            .undertitle {
+                font-size: 18px;
+            }
+            
+            .main-container {
+                padding: 30px;
+            }
+            
+            .content-section {
+                height: 350px;
+            }
+            
+            .first-section .text1, .second-section .text2 {
+                font-size: 20px;
+            }
+            
+            .slider-container {
+                height: 350px;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .first-section .text1 {
+                width: 50%;
+                font-size: 24px;
+            }
+            
+            .second-section .text2 {
+                width: 55%;
+                font-size: 24px;
+                margin-left: 90px;
+            }
+            
+            .slider-container {
+                max-width: 400px;
+            }
+        }

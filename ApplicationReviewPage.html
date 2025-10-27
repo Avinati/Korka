@@ -4,33 +4,676 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Страница просмотра заявок</title>
-    <link rel="stylesheet" href="ApplicationReviewPage.css">
+    <style>
+        /* Основное */
+        html, body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #fffbf1;
+            font-family: Arial, sans-serif;
+            color: #380c0c;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Чердак */
+        .header-box {
+            background-color: #af2828;
+            flex-direction: column;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            padding: 10px 20px;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            flex-wrap: wrap;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            flex-wrap: wrap;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .logo {
+            width: 80px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .undertitle {
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .btn-auth, .btn1, .btn2, .btn-logout {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 150px;
+            height: 40px;
+            background: none;
+            padding: 8px 15px;
+            font-size: 14px;
+            color: #380c0c;
+            border-radius: 15px;
+            border: 2px solid #922121;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-auth:hover, .btn1:hover, .btn2:hover, .btn-logout:hover {
+            background: #922121;
+            color: #fffbf1;
+            border-radius: 15px;
+            border: 2px solid #922121;
+            cursor: pointer;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Основной контент */
+        .main-container {
+            border-radius: 30px;
+            margin: 20px;
+            min-height: 800px;
+            background-color: #e7e2d3;
+            flex-shrink: 0;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .somthing-container {
+            border-bottom: 2px solid #380c0c;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        .t1 {
+            font-size: 28px;
+            margin: 0;
+            color: #380c0c;
+        }
+
+        /* Стили для списка заявок */
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .application {
+            background-color: #fffbf1;
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .application:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            background-color: #f3ede1;
+        }
+
+        .specialty-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .specialty-row p {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .app-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .status-pending {
+            background-color: #0066cc;
+            color: #ffffff;
+            border: 1px solid #00366d;
+        }
+
+        .status-approved {
+            background-color: #ffcc00;
+            color: #380c0c;
+            border: 1px solid #7c6300;
+        }
+
+        .status-completed {
+            background-color: #00aa00;
+            color: #ffffff;
+            border: 1px solid #007c00;
+        }
+
+        .app-details {
+            font-size: 18px;
+        }
+
+        .app-details p {
+            margin: 10px 0;
+        }
+
+        .rating {
+            font-size: 24px;
+        }
+
+        .star {
+            color: #ddd;
+        }
+
+        .star.active {
+            color: gold;
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(56, 12, 12, 0.7);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: #fffbf1;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 20px;
+            border: 3px solid #922121;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(56, 12, 12, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { 
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            color: #380c0c;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #af2828;
+            transform: scale(1.1);
+        }
+
+        .modal-content h3 {
+            font-size: 24px;
+            color: #380c0c;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid #380c0c;
+            padding-bottom: 10px;
+        }
+
+        .review-form p {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #380c0c;
+        }
+
+        .review-form p strong {
+            color: #922121;
+        }
+
+        /* Стили для рейтинга в модальном окне */
+        .rating-section p {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .rating-modal {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .star-modal {
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0 5px;
+        }
+
+        .star-modal:hover,
+        .star-modal.active {
+            color: gold;
+            transform: scale(1.1);
+        }
+
+        .rating-modal:hover .star-modal {
+            color: gold;
+        }
+
+        .rating-modal .star-modal:hover ~ .star-modal {
+            color: #ddd;
+        }
+
+        .review-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: none;
+            font-size: 16px;
+            color: #380c0c;
+            border-radius: 15px;
+            border: 2px solid #922121;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .review-btn:hover {
+            background: #922121;
+            color: #fffbf1;
+            border-radius: 15px;
+            border: 2px solid #922121;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Кнопка отправки отзыва */
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: none;
+            font-size: 20px;
+            color: #380c0c;
+            border-radius: 15px;
+            border: 2px solid #922121;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .btn-submit:hover {
+            background: #922121;
+            color: #fffbf1;
+            border-radius: 15px;
+            border: 2px solid #922121;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-submit:disabled:hover {
+            background: none;
+            color: #380c0c;
+        }
+
+        /* Подвал */
+        .footer-box {
+            background-color: #af2828;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            margin-top: auto;
+            flex-shrink: 0;
+            padding: 20px;
+        }
+
+        .footer-container {
+            display: flex;
+            align-items: flex-start;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: space-between;
+        }
+
+        .footer-columns {
+            display: flex;
+            gap: 50px;
+            flex-wrap: wrap;
+        }
+
+        .footer-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer-column li {
+            font-weight: bold;
+            margin-bottom: 10px;
+            list-style: none;
+        }
+
+        .footer-column ul {
+            margin: 5px 0;
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-column a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .footer-column a:hover,
+        .footer-column a:focus,
+        .footer-column a:active {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Общие стили для всех ссылок */
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        a:hover, a:focus, a:active {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Стили для предупреждения о авторизации */
+        .auth-warning {
+            background-color: #fffbf1;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .warning-content h3 {
+            font-size: 24px;
+            color: #af2828;
+            margin-bottom: 15px;
+        }
+
+        .warning-content p {
+            font-size: 18px;
+            margin-bottom: 0;
+        }
+
+        .warning-content a {
+            color: #af2828;
+            text-decoration: underline;
+        }
+
+        /* Сообщения о загрузке и отсутствии заявок */
+        .loading-message, .no-applications-message {
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 20px;
+        }
+
+        .no-applications-content {
+            background-color: #fffbf1;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .no-applications-content h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .no-applications-content p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 12px 25px;
+            background: none;
+            font-size: 18px;
+            color: #380c0c;
+            border-radius: 15px;
+            border: 2px solid #922121;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #922121;
+            color: #fffbf1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Адаптивные стили для мобильных устройств */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .logo-container {
+                margin-left: 0;
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .buttons {
+                width: 100%;
+                justify-content: center;
+                margin-top: 15px;
+            }
+            
+            .btn-auth, .btn1, .btn2, .btn-logout {
+                min-width: 120px;
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+            
+            .main-container {
+                margin: 10px;
+                padding: 15px;
+                border-radius: 20px;
+            }
+            
+            .t1 {
+                font-size: 24px;
+            }
+            
+            .specialty-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .app-status {
+                align-self: flex-start;
+                margin-top: 10px;
+            }
+            
+            .footer-container {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .footer-columns {
+                gap: 30px;
+                justify-content: center;
+            }
+            
+            .modal-content {
+                padding: 15px;
+                margin: 10% auto;
+            }
+            
+            .modal-content h3 {
+                font-size: 20px;
+            }
+            
+            .rating-modal {
+                font-size: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 20px;
+            }
+            
+            .undertitle {
+                font-size: 12px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .btn-auth, .btn1, .btn2, .btn-logout {
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .t1 {
+                font-size: 20px;
+            }
+            
+            .app-details {
+                font-size: 16px;
+            }
+            
+            .specialty-row p {
+                font-size: 16px;
+            }
+            
+            .footer-columns {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 10px;
+            }
+            
+            .rating-modal {
+                font-size: 24px;
+            }
+            
+            .btn-submit {
+                font-size: 16px;
+                padding: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Чердак -->
     <div class="header-box">
         <div class="header-container">
             <a class="logo-container" href="Main.html" style="text-decoration: none; color: inherit;">
-                <img src="media/logo.png" class="logo">
-                <h1 class="title">Корочки.есть</h1>
-                <h3 class="undertitle">Только "Не" качественное государственное оброзование.</h3>
+                <img src="media/logo.png" class="logo" alt="Логотип">
+                <div>
+                    <h1 class="title">Корочки.есть</h1>
+                    <h3 class="undertitle">Только "Не" качественное государственное оброзование.</h3>
+                </div>
             </a>
             <div class="buttons">
                 <div id="authSection" style="display: none;">
                     <span id="userGreeting" style="margin-right: 15px; color: #333;"></span>
-                    
                 </div>
                 <div id="unauthSection">
                     <a href="Authorization.html" class="btn-auth">Войти</a>
                 </div>
-                <a href="ApplicationReviewPage.html" class="btn1">Страница просмотра заявок.</a>
-                <a href="RequestFormationPage.html" class="btn2">Страница формирования заявки.</a>
+                <a href="ApplicationReviewPage.html" class="btn1">Страница просмотра заявок</a>
+                <a href="RequestFormationPage.html" class="btn2">Страница формирования заявки</a>
                 <button id="logoutBtn" class="btn-logout">Выйти</button>
             </div>
         </div>
     </div>
 
-<!-- Основной контент -->
+    <!-- Основной контент -->
     <div class="main-container">
         <div class="somthing-container">
             <h2 class="t1">Ваши заявки:</h2>
@@ -92,32 +735,34 @@
         </div>
     </div>
 
-<!-- Подвал -->
+    <!-- Подвал -->
     <div class="footer-box">
         <div class="footer-container">
             <a class="logo-container" href="Main.html" style="text-decoration: none; color: inherit;">
-                <img src="media/logo.png" class="logo">
-                <h1 class="title">Корочки.есть</h1>
-                <h3 class="undertitle">Только "Не" качественное государственное оброзование.</h3>
+                <img src="media/logo.png" class="logo" alt="Логотип">
+                <div>
+                    <h1 class="title">Корочки.есть</h1>
+                    <h3 class="undertitle">Только "Не" качественное государственное оброзование.</h3>
+                </div>
             </a>
             <div class="footer-columns">
                 <div class="footer-column">
                     <li>Страницы</li>
                     <ul>
-                        <li><a href="Main.html" style="text-decoration: none; color: inherit;">Главная</a></li>
-                        <li><a href="ApplicationReviewPage.html" style="text-decoration: none; color: inherit;">Страница просмотра заявок</a></li>
-                        <li><a href="RequestFormationPage.html" style="text-decoration: none; color: inherit;">Страница формирования заявки</a></li>
-                        <li><a href="AdminPanel.html" style="text-decoration: none; color: inherit;">Админ-панель</a></li>
+                        <li><a href="Main.html">Главная</a></li>
+                        <li><a href="ApplicationReviewPage.html">Страница просмотра заявок</a></li>
+                        <li><a href="RequestFormationPage.html">Страница формирования заявки</a></li>
+                        <li><a href="AdminPanel.html">Админ-панель</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <li>Документация</li>
                     <ul>
-                        <li><a href="#" style="text-decoration: none; color: inherit;">Условия пользователя</a></li>
-                        <li><a href="#" style="text-decoration: none; color: inherit;">Условия использования</a></li>
-                        <li><a href="#" style="text-decoration: none; color: inherit;">Политика куки</a></li>
-                        <li><a href="#" style="text-decoration: none; color: inherit;">Политика конфиденциальности</a></li>
-                        <li><a href="#" style="text-decoration: none; color: inherit;">О нас</a></li>
+                        <li><a href="#">Условия пользователя</a></li>
+                        <li><a href="#">Условия использования</a></li>
+                        <li><a href="#">Политика куки</a></li>
+                        <li><a href="#">Политика конфиденциальности</a></li>
+                        <li><a href="#">О нас</a></li>
                     </ul>
                 </div>
             </div>
