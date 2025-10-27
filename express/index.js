@@ -510,49 +510,115 @@ app.post('/admin-auth', async (req, res) => {
     }
 });
 
-// Получение всех заявок для админ-панели
+app.post('/admin-login', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        // Проверяем специальные учетные данные администратора
+        if (username === 'Admin' && password === 'KorokNET') {
+            console.log('✅ Успешная авторизация администратора через логин');
+            
+            const adminUser = {
+                user_id: 0,
+                name: 'Admin',
+                surname: 'System',
+                nick: 'admin',
+                email: 'admin@system',
+                role: 'admin'
+            };
+            
+            return res.json({ 
+                success: true, 
+                message: 'Авторизация прошла успешно!',
+                user: adminUser
+            });
+        }
+
+        // Если нужна проверка через базу данных, можно оставить эту часть
+        const [users] = await pool.execute(
+            `SELECT user_id, name, surname, email, role, password 
+             FROM users 
+             WHERE (email = ? OR nick = ?) AND role = 'admin'`,
+            [username, username]
+        );
+
+        if (users.length === 0) {
+            return res.json({ 
+                success: false, 
+                message: 'Пользователь не найден или нет прав администратора' 
+            });
+        }
+
+        const user = users[0];
+
+        // В реальном приложении здесь должно быть хеширование пароля
+        if (user.password !== password) {
+            return res.json({ 
+                success: false, 
+                message: 'Неверный пароль' 
+            });
+        }
+
+        // Успешная авторизация
+        res.json({
+            success: true,
+            user: {
+                user_id: user.user_id,
+                name: user.name,
+                surname: user.surname,
+                email: user.email,
+                role: user.role
+            },
+            message: 'Авторизация успешна'
+        });
+
+    } catch (error) {
+        console.error('Ошибка при авторизации администратора:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Ошибка сервера при авторизации' 
+        });
+    }
+});
+
+// Эндпоинт для получения всех заявок (для админ-панели)
 app.get('/admin-applications', async (req, res) => {
     try {
-        console.log('📨 Получен запрос на получение заявок для админ-панели');
-        
         const [applications] = await pool.execute(`
             SELECT 
                 a.application_id,
-                a.user_id,
-                a.desired_start_date,
-                a.payment_method,
                 a.status,
                 a.created_at,
-                c.name as course_name,
-                c.price,
+                a.updated_at,
+                u.user_id,
                 u.name as user_name,
                 u.surname as user_surname,
-                u.email as user_email
+                u.email as user_email,
+                c.course_id,
+                c.name as course_name,
+                c.price
             FROM applications a
-            JOIN courses c ON a.course_id = c.course_id
             JOIN users u ON a.user_id = u.user_id
+            JOIN courses c ON a.course_id = c.course_id
             ORDER BY 
-                CASE 
-                    WHEN a.status = 'new' THEN 1
-                    WHEN a.status = 'in_progress' THEN 2
-                    WHEN a.status = 'completed' THEN 3
-                    ELSE 4
+                CASE a.status 
+                    WHEN 'new' THEN 1
+                    WHEN 'in_progress' THEN 2
+                    WHEN 'completed' THEN 3
                 END,
                 a.created_at DESC
         `);
 
-        console.log(`✅ Отправлено ${applications.length} заявок`);
-
-        res.json({ 
-            success: true, 
-            applications 
+        res.json({
+            success: true,
+            applications: applications
         });
 
     } catch (error) {
-        console.error('❌ Ошибка при получении заявок для админ-панели:', error);
-        res.json({ 
+        console.error('Ошибка при загрузке заявок:', error);
+        res.status(500).json({ 
             success: false, 
-            message: 'Ошибка при получении заявок' 
+            message: 'Ошибка сервера при загрузке заявок' 
         });
     }
 });
@@ -565,75 +631,125 @@ app.put('/admin-applications/:id/status', async (req, res) => {
     console.log(`🔄 Запрос на изменение статуса: заявка ${applicationId}, новый статус: ${newStatus}`);
 
     if (!newStatus) {
-        return res.json({ 
+        return res.status(400).json({ 
             success: false, 
             message: 'Статус обязателен для заполнения' 
         });
     }
 
     if (!['new', 'in_progress', 'completed'].includes(newStatus)) {
-        return res.json({ 
+        return res.status(400).json({ 
             success: false, 
             message: 'Неверный статус' 
         });
     }
 
+    let connection;
     try {
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+
         // Получаем текущий статус заявки
-        const [currentApps] = await pool.execute(
+        const [currentApps] = await connection.execute(
             'SELECT status FROM applications WHERE application_id = ?',
             [applicationId]
         );
 
         if (currentApps.length === 0) {
             console.log('❌ Заявка не найдена:', applicationId);
-            return res.json({ 
+            await connection.rollback();
+            return res.status(404).json({ 
                 success: false, 
                 message: 'Заявка не найдена' 
             });
         }
 
         const oldStatus = currentApps[0].status;
+        
+        if (oldStatus === newStatus) {
+            await connection.rollback();
+            return res.json({ 
+                success: true, 
+                message: 'Статус уже установлен' 
+            });
+        }
+
         console.log(`📊 Текущий статус: ${oldStatus}, новый статус: ${newStatus}`);
 
         // Обновляем статус заявки
-        const [updateResult] = await pool.execute(
+        const [updateResult] = await connection.execute(
             'UPDATE applications SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE application_id = ?',
             [newStatus, applicationId]
         );
 
-        console.log(`✅ Статус заявки ${applicationId} изменен в БД. Затронуто строк:`, updateResult.affectedRows);
-
-        // Для специального администратора (user_id: 0) или если adminId не передан
-        let changedById = adminId;
-        let changeComment = `Статус изменен администратором`;
-        
-        if (!adminId || adminId === 0) {
-            changedById = null;
-            changeComment = `Статус изменен системным администратором`;
+        if (updateResult.affectedRows === 0) {
+            throw new Error('Не удалось обновить заявку');
         }
 
-        // Добавляем запись в историю статусов
-        await pool.execute(
+        console.log(`✅ Статус заявки ${applicationId} изменен в БД. Затронуто строк:`, updateResult.affectedRows);
+
+        // ИСПРАВЛЕНИЕ: Проверяем существование пользователя перед вставкой в историю
+        let changedById = null;
+        let changeComment = `Статус изменен системным администратором`;
+
+        if (adminId && adminId !== 0) {
+            // Проверяем существование администратора в базе
+            const [adminUsers] = await connection.execute(
+                'SELECT user_id FROM users WHERE user_id = ? AND role = "admin"',
+                [adminId]
+            );
+
+            if (adminUsers.length > 0) {
+                changedById = adminId;
+                changeComment = `Статус изменен администратором ID: ${adminId}`;
+            }
+        }
+
+        // Вставляем запись в историю (changed_by может быть NULL для системных действий)
+        const [historyResult] = await connection.execute(
             `INSERT INTO application_status_history (application_id, old_status, new_status, changed_by, change_comment) 
              VALUES (?, ?, ?, ?, ?)`,
             [applicationId, oldStatus, newStatus, changedById, changeComment]
         );
 
-        console.log(`✅ История статусов обновлена для заявки ${applicationId}`);
+        console.log(`✅ История статусов обновлена для заявки ${applicationId}, ID записи:`, historyResult.insertId);
+
+        await connection.commit();
 
         res.json({ 
             success: true, 
-            message: 'Статус заявки успешно обновлен'
+            message: 'Статус заявки успешно обновлен',
+            data: {
+                applicationId: applicationId,
+                oldStatus: oldStatus,
+                newStatus: newStatus
+            }
         });
 
     } catch (error) {
         console.error('❌ Ошибка при обновлении статуса заявки:', error);
         
-        res.json({ 
+        if (connection) {
+            await connection.rollback();
+        }
+        
+        // Более подробное сообщение об ошибке
+        let errorMessage = 'Ошибка сервера при обновлении статуса';
+        if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+            errorMessage = 'Ошибка целостности данных: администратор не найден в системе';
+        } else if (error.code === 'ER_DUP_ENTRY') {
+            errorMessage = 'Дублирующаяся запись';
+        }
+        
+        res.status(500).json({ 
             success: false, 
-            message: 'Ошибка сервера при обновлении статуса' 
+            message: errorMessage,
+            error: error.message 
         });
+    } finally {
+        if (connection) {
+            connection.release();
+        }
     }
 });
 

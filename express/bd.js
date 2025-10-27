@@ -2,7 +2,7 @@ const mysql = require('mysql2/promise');
 
 const dbConfig = {
 host:'151.241.228.247',
-  user:'admin',
+  user:'nick',
   password: 'root',
   database:'Korka',
   waitForConnections: true, 
